@@ -991,8 +991,86 @@
      Note: When we are refering the Bean then we have to use ($) and 
      When we are refering the field we have to use (*) sign.  
 
-101: 
+101: Demo of Bean Validations inside Contact form Page
+     • Sample validations declaration inside a Java POJO class.
+
+        @Data
+        public class Contact {
+
+        @NotBlank(message = "Email must not be blank")
+        @Email(message = "Please provide a valid email address")
+        private String email;
+
+        @NotBlank(message = "Subject must not be blank")
+        @Size(min = 5, message = "Subject must be at least 5 characters long")
+        private String subject;
+
+        @NotBlank(message = "Message must not be blank")
+        @Size(min = 10, message = "Message must be at least 10 characters long")
+        private String message;
+        }
+
+     • We can put the @Valid annotation on method parameters to tell Spring framework that we want a particular POJO object needs to be 
+     validated based on the validation annotation configurations. For any issues, framework populates the error details inside the Errors 
+     object. The errors can be used to display on the UI to the user. Sample example code is below.
    
+     @RequestMapping(value = "/saveMsg", method = POST)
+    public String saveMessage(@Valid @ModelAttribute("contact") Contact contact, Errors errors) {
+
+    if (errors.hasErrors()) {
+        log.error("Contact form validation failed due to : " + errors.toString());
+        return "contact.html";
+    }
+
+    contactService.saveMessageDetails(contact);
+    return "redirect:/contact";
+    }
+
+    <ul>
+    <li class="alert alert-danger" role="alert"
+        th:each="error : ${#fields.errors('contact.*')}"
+        th:text="${error}" />
+    </ul>
+
+##################################### SECTION 10: VALIDATING THE INPUT USING JAVA & HIBERNATE VALIDATORS #####################################
+
+102: Introduction to Spring Web Scopes
+    Web Scopes inside Spring
+    -> Request (@RequestScope)
+    -> Session (@SessionScope)
+    -> Application (@ApplicationScope)
+
+    1 Request Scope – Spring creates an instance of the bean class for every HTTP request. The instance exists only for that specific 
+    HTTP request.
+    2 Session Scope – Spring creates an instance and keeps the instance in the server’s memory for the full HTTP session. Spring links the 
+    instance in the context with the client’s session.
+    3 Application Scope – The instance is unique in the app’s context, and it’s available while the app is running.
+
+103: Use Cases of Spring Web Scopes
+    Request Scope
+    ✓ Many Beans for One/Many Session Every Time.
+    ✓ Creates every bean for every HTTP request, creates lots of Bean.
+    ✓ Spring creates a lot of instances of this bean in the app’s memory for each HTTP request. So these types of beans are short-lived.
+    ✓ Since Spring creates a lot of instances, please make sure to avoid time-consuming logic while creating the instance.
+    ✓ Can be considered for the scenarios where the data needs to be reset after new request or page refresh etc.
+
+    Session Scope
+    ✓ One Bean for One Session.
+    ✓ When the session is open the Bean is open.
+    ✓ Session scoped beans have longer life & they are less frequently garbage collected.
+    ✓ Avoid keeping too much information inside session data as it impacts performance. Never store sensitive information as well.
+    ✓ Can be considered for the scenarios where the same data needs to be accessed across multiple pages like user information.
+
+    Application Scope
+    ✓ One Bean for all Session.
+    ✓ Bean created once and many browsers/http/user can access the same Bean, Other Bean could not be created.
+    ✓ In the application scope, Spring creates a bean instance per web application runtime.
+    ✓ It is similar to singleton scope, with one major difference. Singleton scoped bean is singleton per ApplicationContext where application 
+    scoped bean is singleton per ServletContext.
+    ✓ Can be considered for the scenarios where we want to store Drop Down values, Reference table values which won’t change for all the users.
+
+    
+
 
    
     
