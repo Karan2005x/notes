@@ -1032,7 +1032,7 @@
         th:text="${error}" />
     </ul>
 
-##################################### SECTION 10: VALIDATING THE INPUT USING JAVA & HIBERNATE VALIDATORS #####################################
+############################################### SECTION 11: BEANS WEB SCOPE INSIDE SPRING FRAMEWORK ###############################################
 
 102: Introduction to Spring Web Scopes
     Web Scopes inside Spring
@@ -1069,7 +1069,28 @@
     scoped bean is singleton per ServletContext.
     ✓ Can be considered for the scenarios where we want to store Drop Down values, Reference table values which won’t change for all the users.
 
-    
+104: Demo of @RequestScope inside Eazy School Web Application
+
+105: Demo of @SessionScope inside Eazy School Web Application
+
+106: Demo of @ApplicationScope inside Eazy School Web Application
+
+######################################## SECTION 12: IMPLEMENT SECURITY INSIDE WEB APP - SECURITY PART-1 ########################################
+
+107: Introduction to Spring Security
+    • Spring Security is a powerful and highly customizable authentication and access-control framework. It is the de-facto standard for 
+    securing Spring-based applications.
+    • Below is the maven dependency that we can add to implement security using Spring Security project in any of the SpringBoot projects,
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+    -> Spring Security is a framework that provides authentication, authorization, and protection against common attacks.
+    -> Spring Security helps developers with easier configurations to secure a web application by using standard username/password 
+    authentication mechanism.
+    -> Spring Security provides out of the box features to handle common security attacks like CSRF, CORS. It also has good 
+    integration with security standards like JWT, OAUTH2 etc.
 
 
    
