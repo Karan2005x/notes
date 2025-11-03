@@ -1092,10 +1092,115 @@
     -> Spring Security provides out of the box features to handle common security attacks like CSRF, CORS. It also has good 
     integration with security standards like JWT, OAUTH2 etc.
 
+108: Deepdive of Authentication Vs Authorization
+    AUTHENTICATION
+    -> In authentication, the identity of users are checked for providing the access to the system.
+    -> Authentication done before authorization.
+    -> It needs usually user login details.
+    -> If authentication fails usually we will get 401 error response.
+    -> For example as a Bank customer/employee in order to perform actions in the app, we need to prove our identity.
 
+    AUTHORIZATION
+    -> In authorization, person’s or user’s authorities are checked for accessing the resources.
+    -> Authorization always happens after authentication.
+    -> It needs user’s privilege or roles.
+    -> If authorization fails usually we will get 403 error response.
+    -> Once logged into the application, my roles, authorities will decide what kind of actions I can do.
    
+109: Demo of Spring Security inside Eazy School Web App with default behavior
+
+110: Configure custom credentials inside Spring Security
     
-   
+    Quick Tip => 
+    Do you know,
+
+    ✔ As soon as we add spring security dependency to a web application, by default it protects all the pages/APIs inside it. 
+    It will redirect to the inbuilt login page to enter credentials.
+    ✔ The default credentials are user and password is randomly generated & printed on the console.
+    ✔ We can configure custom credentials using the below properties to get started for POCs etc. But for PROD applications, Spring Security 
+    supports user credentials configuration inside DB, LDAP, OAUTH2 Server etc.
+    
+111: IMPORTANT NOTE about Spring Security
+    Starting from Spring Security 6.1 and Spring Boot 3.1.0 versions, the Spring Security framework team recommends using the Lambda DSL 
+    style for configuring security for APIs, web paths, etc. Consequently, they have deprecated a few methods within the framework. These 
+    deprecated methods are planned to be removed in Spring Security 7, which is expected to be released in the next 2-3 years. This timeframe 
+    allows all developers sufficient time for migrating their code.
+
+    However, theres no need to worry as this change does not alter the underlying concepts, . Instead of using normal Java configurations, 
+    we will now employ the Lambda DSL. Below, you will find an example code snippet illustrating the differences between the two styles:
+
+    Please note that the course is recorded using Spring Boot 3 and Spring Security 6 versions, where normal Java style configurations are used 
+    instead of Lambda DSL. Therefore, I encourage you to follow the videos to understand the concepts, methods, configurations, etc., and try to 
+    use Lambda DSL style configurations.
+    For your reference, I have updated the code in the GitHub repository to use the Lambda DSL style. You should be able to comprehend the 
+    Lambda DSL style, but if you have any questions, please feel free to reach out to me.
+    The Lambda DSL was created to accomplish to following goals:
+    Automatic indentation makes the configuration more readable.
+    The is no need to chain configuration options using .and()
+    The Spring Security DSL has a similar configuration style to other Spring DSLs such as Spring Integration and Spring Cloud Gateway.
+
+112: Understanding default security configurations inside Spring Security framework
+    By default, Spring Security framework protects all the paths present inside the web application. This behaviour is due to the code 
+    present inside the method defaultSecurityFilterChain(HttpSecurity http) of class SpringBootWebSecurityConfiguration
+
+    @Bean
+    @Order(SecurityProperties.BASIC_AUTH_ORDER)
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests().anyRequest().authenticated();
+    http.formLogin();
+    http.httpBasic();
+    return http.build();
+    }
+
+113: Configure permitAll() inside Web App using Spring Security
+    Using permitAll() configurations we can allow full/public access to a specific resource/path or all the resources/paths inside 
+    a web application.
+    Below is the sample configuration that we can do in order to allow any requests in a Web application without security.
+
+    @Configuration
+    public class ProjectSecurityConfig {
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests()
+            .anyRequest().permitAll()
+            .and().formLogin()
+            .and().httpBasic();
+
+        return http.build();
+        }
+    }
+
+    ☁️ Form Login provides support for username and password being provided through an HTML form.
+    ☁️ HTTP Basic Auth uses an HTTP header in order to provide the username and password when making a request to a server.
+
+114. Configure denyAll() inside Web App using Spring Security
+    Using denyAll() configurations we can deny access to a specific resource/path or all the resources/paths inside a web application 
+    regardless of user authentication.
+    Below is the sample configuration that we can do in order to deny any requests that is coming into a web application.
+
+    @Configuration
+    public class ProjectSecurityConfig {
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        http.authorizeHttpRequests()
+            .anyRequest().denyAll()
+            .and().formLogin()
+            .and().httpBasic();
+
+        return http.build();
+        }
+    }
+
+    ☁️ Usually denyAll() is used to retire a specific API temporarily without removing the code.
+    ☁️ permitAll() is used to allow public access to public APIs, paths, CSS, images, JS files etc.
+
+    
+
+
+
+
     
     
     
