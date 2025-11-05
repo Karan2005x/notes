@@ -1174,7 +1174,7 @@
     ☁️ Form Login provides support for username and password being provided through an HTML form.
     ☁️ HTTP Basic Auth uses an HTTP header in order to provide the username and password when making a request to a server.
 
-114. Configure denyAll() inside Web App using Spring Security
+114: Configure denyAll() inside Web App using Spring Security
     Using denyAll() configurations we can deny access to a specific resource/path or all the resources/paths inside a web application 
     regardless of user authentication.
     Below is the sample configuration that we can do in order to deny any requests that is coming into a web application.
@@ -1196,14 +1196,258 @@
     ☁️ Usually denyAll() is used to retire a specific API temporarily without removing the code.
     ☁️ permitAll() is used to allow public access to public APIs, paths, CSS, images, JS files etc.
 
+115:  Configure custom security configurations using Spring Security
+    .authenticated() used to secure a specific entire page
+
+    .requestMatchers("/holidays/**").permitAll()
+    .requestMatchers("/courses").authenticated()
+
+116: Demo of CSRF protection & CSRF Disable inside Spring Security framework 
+    CSRF = Cross-Site Request Forgery
+    • We can apply custom security configurations based on our requirements for each API/URL like below.
+    • permitAll() can be used to allow access w/o security and authenticated() can be used to protect a web page/API.
+    • By default any requests with HTTP methods that can update data like POST, PUT will be stopped with 403 error due to CSRF protection. 
+    We can disable the same for now and enable it in the coming sections when we started generating CSRF tokens.
+    • Below is the sample configuration that we can do to implement custom security configs and disable CSRF.
+
+    @Configuration
+    public class ProjectSecurityConfig {
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .authorizeHttpRequests()
+                .requestMatchers("/dashboard").authenticated()
+                .requestMatchers("", "/", "/home").permitAll()
+                .requestMatchers("/holidays/**").permitAll()
+                .requestMatchers("/contact").permitAll()
+                .requestMatchers("/saveMsg").permitAll()
+                .requestMatchers("/courses").permitAll()
+                .requestMatchers("/about").permitAll()
+                .requestMatchers("/assets/**").permitAll()
+            .and().formLogin()
+            .and().httpBasic();
+        return http.build();
+        }
+    }
+
+117: Configure multiple users using inMemoryAuthentication() of Spring Security
+    • Spring Security provide support for username/password based authentication based on the users stored in application memory.
+    • Like mentioned below, we can configure any number of users & their roles, passwords using in-memory authentication.
+
+    @Configuration
+    public class ProjectSecurityConfig {
+        @Bean
+        SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception { ... }
+        @Bean
+        public InMemoryUserDetailsManager userDetailsService() {
+
+            UserDetails admin = User.withDefaultPasswordEncoder()
+                .username("user")
+                .password("12345")
+                .roles("USER")
+                .build();
+
+            UserDetails user = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("54321")
+                .roles("USER", "ADMIN")
+                .build();
+
+            return new InMemoryUserDetailsManager(user, admin);
+        }
+    }
+
+    ☁️ Note:
+    In-memory authentication is ideal for POC (Proof of Concept) web apps or internal web apps used only in non-production environments.
+    NEVER EVER use in-memory authentication for production web applications.
+
+118: Implement Login & Logout inside Web App - Part 1
+    • Spring Security allows us to configure a custom login page to our web application instead of using the Spring Security default 
+    provided login page.
+    • Similarly we can configure logout page as well.
+    • Below is the sample configuration that we can follow.
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf().disable()
+        .authorizeHttpRequests()
+            .requestMatchers("/dashboard").authenticated()
+            .requestMatchers("", "/", "/home").permitAll()
+            .requestMatchers("/holidays/**").permitAll()
+            .requestMatchers("/contact").permitAll()
+            .requestMatchers("/saveMsg").permitAll()
+            .requestMatchers("/courses").permitAll()
+            .requestMatchers("/about").permitAll()
+            .requestMatchers("/assets/**").permitAll()
+            .requestMatchers("/login").permitAll()
+        .and().formLogin()
+            .loginPage("/login")
+            .defaultSuccessUrl("/dashboard").failureUrl("/login?error=true").permitAll()
+        .and().logout()
+            .logoutSuccessUrl("/login?logout=true")
+            .invalidateHttpSession(true).permitAll()
+        .and().httpBasic();
+        return http.build();
+    }
+
+    ☁️ Note:
+    Configured login page will be shown if the user tries to access a secured page/resource without a valid authenticated session.
+    The same behavior applies for the default login page provided by Spring Security.
+
+119: Implement Login & Logout inside Web App - Part 2
+
+120: Implement Login & Logout inside Web App - Part 3
+
+121: Demo of integration between ThymeLeaf & Spring Security
+    💡 Do you know, Thymeleaf has a great integration with Spring Security.
+    More details can be found at
+    🔗 https://www.thymeleaf.org/doc/articles/springsecurity.html
+
+    Step 1: Add the below dependency in the pom.xml
+    <dependency>
+    <groupId>org.thymeleaf.extras</groupId>
+    <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+    </dependency>
+
+    Step 2: Add the below XML namespace which enables us to use Thymeleaf Security-related tags
+    <html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+    Step 3: Use any of the Thymeleaf Security tags inside HTML code based on Authentication details
+    sec:authorize="isAnonymous()" 
+    sec:authorize="isAuthenticated()" 
+    sec:authorize="hasRole('ROLE_ADMIN')" 
+    sec:authentication="name" 
+    sec:authentication="principal.authorities"
+
+################################## SECTION 13: EXCEPTION HANDLING USING @ControllerAdvice & @ExceptionHandler ##################################
+
+122: Introduction to @ControllerAdvice & @ExceptionHandler annotations
+    • @ControllerAdvice is a specialization of the @Component annotation which allows handling exceptions across the whole application in one 
+    global handling component.
+    You can think of it as an interceptor of exceptions thrown by methods annotated with @RequestMapping or one of the shortcuts like @GetMapping, 
+    etc.
+    • We can define the exception handle logic inside a method and annotate it with @ExceptionHandler.
+    • Below is the sample configuration that we can follow.
+
+    @ControllerAdvice
+    public class GlobalExceptionController {
+    @ExceptionHandler(Exception.class)
+    public ModelAndView exceptionHandler(Exception exception) {
+        ModelAndView errorPage = new ModelAndView();
+        errorPage.setViewName("error");
+        errorPage.addObject("errormsg", exception.getMessage());
+        return errorPage;
+        }
+    }
+
+    ☁️ Note:
+    Combination of @ControllerAdvice & @ExceptionHandler can handle exceptions across all controllers inside a web application globally.
+
+123: Demo of @ControllerAdvice & @ExceptionHandler annotations
+    💡 Do you know,
+
+    ✅ If a method annotated with @ExceptionHandler is present inside a @Controller class, then the exception handling logic will be applicable 
+    for any exceptions occurred in that specific controller class.
+
+    ✅ If the same @ExceptionHandler annotated method is present inside a @ControllerAdvice class, then the exception handling logic will be 
+    applicable for any exceptions occurred across all the controller classes.
+
+    ✅ Using @ExceptionHandler annotation, we can handle any number of exceptions like the below sample code:
+
+    @ExceptionHandler({NullPointerException.class,
+                   ArrayIndexOutOfBoundsException.class,
+                   IOException.class})
+        public ModelAndView handleException(RuntimeException ex) {
+        // Exception handling logic
+    }
+
+################################## SECTION 14: IMPLEMENT CSRF FIX INSIDE WEB-APP SPRING SECURITY PART-2 ##################################
+
+124: Deep dive of CSRF attack
+    • A typical Cross-Site Request Forgery (CSRF or XSRF) attack aims to perform an operation in a web application on behalf of a user 
+    without their explicit consent. In general, it doesn’t directly steal the user’s identity, but it exploits the user to carry out an 
+    action without their will.
+    • Consider you are using a website netflix.com and the attacker’s website evil.com.
+
+    Step 1: The Netflix user logs in to Netflix.com, and the backend server of Netflix will provide a cookie which will store in the browser 
+    against the domain name Netflix.com
+
+    👤 User submits their credentials & tries to log in to Netflix.com
+    ➡️ Netflix server creates a cookie & saves it in the user’s browser against the Netflix.com domain name.
+
+    Step 2: The same Netflix user opens an evil.com website in another tab of the browser.
+
+    👤 User accesses an evil blog/site hosted on evil.com
+    ⬅️ evil.com returns a web page that has an embedded malicious link to change the email ID of the Netflix account.
+    But the link appears with a text like — “90% OFF on iPhone”
+
+    Step 3 : User tempted and clicked on the malicious link which makes a request to Netflix.com. And since the login cookie already present 
+    in the same browser and the request to change email is being made to the same domain Netflix.com, the backend server of Netflix.com can’t 
+    differentiate from where the request came. So here the evil.com forged the request as if it is coming from a Netflix.com UI page.
+
+    (User clicks on a link on evil.com which has content something like below)
+    Boom !! The email of the Netflix account changed
+
+    <form action="https://netflix.com/changeEmail"
+      method="POST" id="form">
+    <input type="hidden" name="email" value="user@evil.com">
+    </form>
+
+    <script>
+        document.getElementById('form').submit()
+    </script>
+
+125: Solution for CSRF attack - Theory
+    • To defeat a CSRF attack, applications need a way to determine if the HTTP request is legitimately generated via the application’s user 
+    interface. The best way to achieve this is through a CSRF token. A CSRF token is a secure random token that is used to prevent CSRF attacks. 
+    The token needs to be unique per user session and should be of large random value to make it difficult to guess.
+
+    • Let’s see how this solve CSRF attack by taking the previous Netflix example again.
+
+    Step 1 :
+    The Netflix user login to Netflix.com and the backend server of Netflix will provide a cookie which will store in the browser against the 
+    domain name Netflix.com along with a randomly generated unique CSRF token for this particular user session. CSRF token is inserted within 
+    hidden parameters of HTML forms to avoid exposure to session cookies.
+
+    (User submit his credentials & try to login to Netflix.com)
+    (Netflix server create a cookie & randomly generated CSRF token)
+        
+    Step 2 :
+    The same Netflix user opens an evil.com website in another tab of the browser.
+
+    (User accessed an evil blog/site hosted on evil.com)
+    (evil.com returns a web page which has an embedded malicious link to change email of Netflix account. But link appears with a text like 
+    “90% OFF on iPhone”)
+
+    Step 3 : User tempted and clicked on the malicious link which makes a request to Netflix.com. And since the login cookie already present in 
+    the same browser and the request to change email is being made to the same domain Netflix.com. This time the Netflix.com backend server 
+    expects CSRF token along with the cookie. The CSRF token must be same as initial value generated during login operation.
+
+    (User clicks on a link on evil.com which has content something like below)
+    Boom !! The Netflix threw an error 403
+
+    Note:- The CSRF token will be used by the application server to verify the legitimacy of the end-user request if it is coming from the 
+    same App UI or not. The application server rejects the request if the CSRF token fails to match the test.
+
+    Do you know,
+
+    ✅ By default, Spring Security enables CSRF fix for all the HTTP methods which results in data change like POST, DELETE, etc. But not for GET.
+
+    ✅ Using Spring Security configurations we can disable the CSRF protection for complete application or for only few paths based on our 
+    requirements like below:
+
+    http.csrf().disable()
+    http.csrf().ignoringRequestMatchers("/saveMsg")
+
+    ✅ Thymeleaf has great integration & support with Spring Security to generate a CSRF token.
+    We just need to add the below code in login HTML form code and Thymeleaf will automatically append the CSRF token for the remaining 
+    pages/forms inside the web application:
+    
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
     
 
-
-
-
-    
-    
-    
     
     
 
