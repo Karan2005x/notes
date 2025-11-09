@@ -1446,8 +1446,497 @@
     
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
+126: Solution for CSRF attack - Coding
+
+################################## SECTION 15: DEEP DIVE ON SPRINGBOOT H2 DATABASE & SPRING JDBC FRAMEWORK ##################################
+
+127: Introduction to in-memory H2 Database of Spring Boot
+        H2 provides a fast in-memory database that supports JDBC API and R2DBC access.
+        <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <scope>runtime</scope>
+        </dependency>
+
+    🟩 Since it is an internal memory DB, we need to create the schema and data that is needed during startup of the App. Any updates to the 
+    data will be lost after restarting the server.
+
+    🟨 To create schema & data for the H2 DB, we can add schema.sql & data.sql inside the maven projects resources folder. Any table creation 
+    scripts and DB records scripts can be present inside schema.sql and data.sql respectively.
+
+    🟪 By default, the H2 web console is available at /h2-console. You can customize the console’s path by using the spring.h2.console.path 
+    property.
+
+    The default credentials of H2 DB are username is sa and password is "" (Empty)
+
+128: Setup H2 Database inside a Spring Boot web application
+
+129: Introduction to JDBC & problems with it
+    Key points of JDBC
+    Intro to JDBC=>
+
+    ✅ JDBC or Java Database Connectivity is a specification from Core Java that provides a standard abstraction for Java apps to communicate 
+    with various databases.
+    ✅ JDBC API along with the database driver is capable of accessing databases.
+    ✅ JDBC is a base framework or standard for frameworks like Hibernate, Spring Data JPA, MyBatis etc.
+
+    Steps in JDBC to access DB=>
+    We need to follow the below steps to access DB using JDBC,
+
+    Load Driver Class
+    Obtain a DB connection
+    Obtain a statement using connection object
+    Execute the query
+    Process the result set
+    Close the connection
+
+    Problem with JDBC=>
+    ✅ Developers are forced to follow all the steps mentioned to perform any kind of operation with DB which results in a lot of duplicate 
+    code at many places.
+    ✅ Developers need to handle the checked exceptions that will throw from the API.
+    ✅ JDBC is database dependent.
+
+130: Introduction to Spring JDBC
+    • Spring JDBC simplifies the use of JDBC and helps to avoid common errors. It executes core JDBC workflow, leaving application code to 
+    provide SQL and extract results. It does this magic by providing JDBC templates which developers can use inside their applications.
+
+    • Below is the maven dependency that we need to add to any Spring/SpringBoot projects in order to use Spring JDBC provided templates,
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+
+    -> Spring provides many templates for JDBC related activities. Among them, the famous ones are JdbcTemplate, NamedParameterJdbcTemplate.
+    -> JdbcTemplate is the classic and most popular Spring JDBC approach. This avoids “lowest-level” approach and all others templates uses 
+    JdbcTemplate under the covers.
+    -> NamedParameterJdbcTemplate wraps a JdbcTemplate to provide named parameters instead of the traditional JDBC ? placeholders. This approach 
+    provides better documentation and ease of use when you have multiple parameters for an SQL statement.
+
+131: Deep dive on usage of JdbcTemplate
+    • JdbcTemplate is the central class in the JDBC core package. It handles the creation and release of resources, which helps you avoid common errors, such as forgetting to close the connection. It performs the basic tasks of the core JDBC workflow (such as statement creation and execution), leaving application code to provide SQL and extract results.
+
+    • You can use JdbcTemplate within a DAO implementation through direct instantiation with a DataSource reference, or you can configure it in a Spring IoC container and give it to DAOs as a bean reference.
+
+    • We need to follow the below steps in order to configure JdbcTemplate inside a Spring Web application (Without Spring Boot)
+
+    Step 1 : First we need to create a Data Source Bean inside Web application with the DB credentials like mentioned below.
+    @Bean
+    public DataSource myDataSource() {
+    DriverManagerDataSource dataSource = new DriverManagerDataSource();
+    dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+    dataSource.setUrl("jdbc:mysql://localhost:3306/eazyschool");
+    dataSource.setUsername("user");
+    dataSource.setPassword("password");
+    return dataSource;
+    }
+
+    Step 2 : Inside any Repository/DAO classes where we want to execute queries, we need to create a bean/object of JdbcTemplate by injecting data source bean
+    @Repository
+    public class PersonDAOImpl implements PersonDAO {
     
+    JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public PersonDAOImpl(DataSource dataSource) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        }
+    }
+
+    • Instances of the JdbcTemplate class are thread-safe, once configured. This is important because if needed we can configure a single instance of a JdbcTemplate and then safely inject this shared reference into multiple DAOs (or repositories).
+
+132. Saving Contact Message into DB using JdbcTemplate Insert operation
+
+133. Display Contact messages from DB using JdbcTemplate select operation - Part 1
+
+134: Display Contact messages from DB using JdbcTemplate select operation - Part 2    
+    • RowMapper interface allows to map a row of the relations with the instance of user-defined class. It iterates the ResultSet internally and adds it into the collection. So we don’t need to write a lot of code to fetch the records as ResultSetExtractor.
+
+    • RowMapper saves a lot of code because it internally adds the data of ResultSet into the collection.
+
+    • It defines only one method mapRow that accepts ResultSet instance and int as parameters. Below is the sample usage of it,
+
+    private final RowMapper<Person> personRowMapper = (resultSet, rowNum) -> {
+    Person person = new Person();
+    person.setFirstName(resultSet.getString("first_name"));
+    person.setLastName(resultSet.getString("last_name"));
+    return person;
+    };
+
+    public List<Person> findAllPersons() {
+    return this.jdbcTemplate.query("select first_name, last_name from person", personRowMapper);
+    }
+
+135: Update Contact messages status using JdbcTemplate update operation
+
+136: Implementing AOP inside Eazy School Web Application
+
+137: Display list of Holidays from H2 Database using JdbcTemplate
+
+    Do you know, with Spring Boot working with JdbcTemplate is very easy. Spring Boot auto configures DataSource, JdbcTemplate and NamedParameterJdbcTemplate classes based on the DB connection details mentioned in the property file and you can @Autowired them directly into your own repository classes, as shown in the following example.
+
+    You can customize some properties of the template by using the spring.jdbc.template.* properties, like mentioned below,
+                                                        spring.jdbc.template.max-rows=500
+
+    @Repository
+    public class HolidaysRepository {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public HolidaysRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        }
+    }
+
+########################################### SECTION 16: SETUP MYSQL DB IN AWS & MIGRATING FROM H2 DB ############################################
+
+138: Setup MYSQL DB inside AWS - Part 1
+
+139: Setup MYSQL DB inside AWS - Part 2
+
+140: Migrate from H2 Database to MYSQL Database
+
+141: Demo of MYSQL Database changes inside Eazy School Web App
+
+########################################### SECTION 17: INTRODUCTION TO SPRING DATA & SPRING JPA ############################################
+
+142: Problems with Spring JDBC & how ORM frameworks solve these problems
+    ORM  => OBJECT-RELATIONAL MAPPING
+    
+    JPA => JAVA PERSISTENCE API
+    
+143: Introduction to Spring Data143. Introduction to Spring Data
+    Spring Data is a Spring ecosystem project that simplifies the persistence layer’s development by providing implementations according to the persistence technology we use. This way, we only need to write a few lines of code to define the repositories of our Spring app.
+
+    Spring Application Logic
+
+    Spring Data
+
+    JPA/Hibernate
+    JDBC
+    MongoDB
+    Cassandra
+    Any other persistence technology
+
+    Spring Data is a high-level layer that simplifies the persistence implementation by unifying the various technologies under the same abstractions.
+
+144: Deepdive on Repository,CrudRepository,PagingAndSortingRepository,JpaRepository
+    • Whichever persistence technology your app uses, Spring Data provides a common set of interfaces (contracts) you extend to define the app’s persistence capabilities.
+    • The central interface in the Spring Data repository abstraction is Repository
+
+    🔵 Repository is the most abstract contract. If you extend this contract, your app recognizes the interface you write as a particular Spring Data repository. Still, you won’t inherit any predefined operations (such as adding a new record, retrieving all the records, or getting a record by its primary key). The Repository interface doesn’t declare any method (it is a marker interface).
+
+    🟡 CrudRepository is the simplest Spring Data contract that also provides some persistence capabilities. If you extend this contract to define your app’s persistence capabilities, you get the simplest operations for creating, retrieving, updating, and deleting records. ListCrudRepository is an extension to CrudRepository returning List instead of Iterable wherever applicable.
+
+    🟢 PagingAndSortingRepository provides methods to retrieve entities using the pagination and sorting abstraction. ListPagingAndSortingRepository is an extension to PagingAndSortingRepository returning List instead of Iterable wherever applicable.
+
+    To implement your app’s repositories using Spring Data, you extend specific interfaces. The main interfaces that represent Spring Data contracts are Repository, CrudRepository, ListCrudRepository, PagingAndSortingRepository and ListPagingAndSortingRepository. You extend one of these contracts to implement your app’s persistence capabilities.
+
+    🔵 Repository
+    <<Interface>>
+
+    🟡 CrudRepository
+    <<Interface>>
+
+    🟡 ListCrudRepository
+    <<Interface>>
+
+    🟢 PagingAndSortingRepository
+    <<Interface>>
+
+    🟢 ListPagingAndSortingRepository
+    <<Interface>>
+
+    Do you know,
+
+    ✓ We should not confuse between @Repository annotation and Spring Data Repository interface.
+
+    ✓ Spring Data provides multiple interfaces that extend one another by following the principle called interface segregation. This helps apps to extend what they want instead of always following fat implementation.
+
+    ✓ Some Spring Data modules might provide specific contracts to the technology they represent. For example, using Spring Data JPA, you also can extend the JpaRepository interface directly and similarly using Spring Data Mongo module to your app provides a particular contract named MongoRepository.
+
+145: Introduction to Spring Data JPA
+    Spring Data JPA is available to Spring Boot applications with the JPA starter. This starter dependency not only brings in Spring Data JPA, but also transitively includes Hibernate as the JPA implementation.
+
+    Below is the maven dependency that we need to add to any SpringBoot projects in order to use Spring Data JPA,
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    We need to follow the below steps in order to query a DB using Spring Data JPA inside a Spring Boot application,
+
+    Step 1: We need to indicate a Java POJO class as an entity class by using annotations like @Entity, @Table, @Column
+    @Entity
+    @Table(name = "contact_msg")
+    public class Contact extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
+    @Column(name = "contact_id")
+    private int contactId;
+    }
+
+    💬 Side Note:
+    JPA is just a specification that defines an object-relational mapping (ORM) standard for storing, accessing, and managing Java objects in relational databases. Hibernate is the most popular and widely used implementation of JPA specifications. By default, Spring Data JPA uses Hibernate as a JPA provider.
+
+    Step 2: We need to create interfaces for a given table entity by extending framework provided Repository interfaces. This helps us to run the basic CRUD operations on the table w/o writing method implementations.
+    @Repository
+    public interface ContactRepository extends CrudRepository<Contact, Integer> {
+
+    }
+
+    Step 3: Enable JPA functionality and scanning by using the annotations @EnableJpaRepositories and @EntityScan
+    @SpringBootApplication
+    @EnableJpaRepositories("com.eazybytes.eazyschool.repository")
+    @EntityScan("com.eazybytes.eazyschool.model")
+    public class EazyschoolApplication {
+    }
+
+146: Migrate from Spring JDBC to Spring Data JPA - Part 1
+
+147: Migrate from Spring JDBC to Spring Data JPA - Part 2
+
+    Step4 : We can inject repository beans into any controller/service classes and execute the required DB operations.
+    @Service
+    public class ContactService {
+
+    @Autowired
+    private ContactRepository contactRepository;
+
+    public boolean saveMessageDetails(Contact contact){
+        boolean isSaved = false;
+        Contact savedContact = contactRepository.save(contact);
+        if(null != savedContact && savedContact.getContactId() > 0) {
+            isSaved = true;
+        }
+        return isSaved;
+        }
+    }
+
+148:  Migrate from Spring JDBC to Spring Data JPA - Part 3
+    With Spring Data JPA, we can use the method names to derive a query and fetch the results w/o writing code manually like with traditional JDBC.
+
+    As a developer we just need to define the query methods in a repository interface that extends one of the Spring Data’s repositories such as CrudRepository. Spring Data JPA will create queries and implementation at runtime automatically by parsing these method names.
+
+    Below are few examples,
+    // find persons by last name
+    List<Person> findByLastName(String lastName);
+
+    // find person by email
+    Person findByEmail(String email);
+
+    // find person by email and last name
+    Person findByEmailAndLastname(String email, String lastname);
+
+149:  Migrate from Spring JDBC to Spring Data JPA - Part 4
+
+150: Deep dive on derived query methods inside Spring Data JPA
+    Do you know a derived query method name has two main components separated by the first By keyword.
+
+    The introducer clause like find, read, query, count, or get which tells Spring Data JPA what you want to do with the method. This clause can contain further expressions, such as Distinct to set a distinct flag on the query to be created.
+
+    The criteria clause that starts after the first By keyword. The first By acts as a delimiter to indicate the start of the actual query criteria. The criteria clause is where you define conditions on entity properties and concatenate them with And and Or keywords.
+
+ #################################### SECTION 18: AUDITING SUPPORT BY SPRING DATA JPA INSIDE WEB APPLICATION #####################################
+   
+151: Introduction of Auditing Support by Spring Data JPA
+    Spring Data provides sophisticated support to transparently keep track of who created or changed an entity and when the change happened. To benefit from that functionality, you have to equip your entity classes with auditing metadata that can be defined either using annotations or by implementing an interface.
+
+    Additionally, auditing has to be enabled either through Annotation configuration or XML configuration to register the required infrastructure components.
+
+    Below are the steps that needs to be followed,
+    Step 1: We need to use the annotations to indicate the audit related columns inside DB tables. Spring Data JPA ships with an entity listener that can be used to trigger the capturing of auditing information. We must register the AuditingEntityListener to be used for all the required entities.
+    @Data
+    @MappedSuperclass
+    @EntityListeners(AuditingEntityListener.class)
+    public class BaseEntity {
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private String createdBy;
+
+    @LastModifiedDate
+    @Column(insertable = false)
+    private LocalDateTime updatedAt;
+
+    @LastModifiedBy
+    @Column(insertable = false)
+    private String updatedBy;
+    }
+    @CreatedDate, @CreatedBy, @LastModifiedDate, @LastModifiedBy
+    are the key annotations that support JPA auditing.
+
+    Step 2: Date related info will be fetched from the server by JPA but for CreatedBy & UpdatedBy we need to let JPA know how to fetch that info by implementing AuditorAware interface like shown below.
+    @Component("auditAwareImpl")
+    public class AuditAwareImpl implements AuditorAware<String> {
+
+    @Override
+    public Optional<String> getCurrentAuditor() {
+        return Optional.ofNullable(SecurityContextHolder.getContext()
+                .getAuthentication().getName());
+        }
+    }
+
+    Step 3: Enable JPA auditing by annotating a configuration class with the @EnableJpaAuditing annotation.
+    @SpringBootApplication
+    @EnableJpaRepositories("com.eazybytes.eazyschool.repository")
+    @EntityScan("com.eazybytes.eazyschool.model")
+    @EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
+    public class EazyschoolApplication {
+    }
+
+    Do you know we can print the queries that are being formed and executed by Spring Data JPA by enabling the below properties,
+    spring.jpa.show-sql=true
+    spring.jpa.properties.hibernate.format_sql=true
+
+    show-sql property will print the query on the console/logs whereas format_sql property will print the queries in a readable friendly style.
+    But please make sure to leverage them in non-prod environments only as they impact the performance of the web application.
+
+152: Implement automatic auditing support with Spring Data JPA - Part 1
+
+153: Implement automatic auditing support with Spring Data JPA - Part 2
+
+ ########################################## SECTION 19: BUILDING CUSTOM VALIDATIONS INSIDE SPRING MVC ############################################
+
+154: Building new user registration web page inside Eazy School Web App
+
+155: Building Custom validations for new user registration page - Part 1
+    Important Validation Annotations
+
+    jakarta.validation.constraints.*
+    ✓ @Digits
+    ✓ @Email
+    ✓ @Max
+    ✓ @Min
+    ✓ @NotBlank
+    ✓ @NotEmpty
+    ✓ @NotNull
+    ✓ @Pattern
+    ✓ @Size
+
+    org.hibernate.validator.constraints.*
+    ✓ @CreditCardNumber
+    ✓ @Length
+    ✓ @Currency
+    ✓ @Range
+    ✓ @URL
+    ✓ @UniqueElements
+    ✓ @EAN
+    ✓ @ISBN
+
+    Sample validations declaration inside a Java POJO class.
+    @Data
+    public class Contact {
+
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Please provide a valid email address")
+    private String email;
+
+    @NotBlank(message = "Subject must not be blank")
+    @Size(min = 5, message = "Subject must be at least 5 characters long")
+    private String subject;
+
+    @NotBlank(message = "Message must not be blank")
+    @Size(min = 10, message = "Message must be at least 10 characters long")
+    private String message;
+    }
+
+    We can put the @Valid annotation on method parameters to tell Spring framework that we want a particular POJO object needs to be validated based on the validation annotation configurations. For any issues, framework populates the error details inside the Errors object. The errors can be used to display on the UI to the user. Sample example code is below,
+
+    @RequestMapping(value = "/saveMsg", method = POST)
+    public String saveMessage(@Valid @ModelAttribute("contact") Contact contact, Errors errors) {
+
+    if (errors.hasErrors()) {
+        log.error("Contact form validation failed due to: " + errors.toString());
+        return "contact.html";
+    }
+
+    contactService.saveMessageDetails(contact);
+    return "redirect:/contact";
+    }
+
+    <ul>
+    <li class="alert alert-danger" role="alert" th:each="error : ${#fields.errors('contact.*')}"
+        th:text="${error}" />
+    </ul>
+
+    We have seen before using Bean validations like Max, Min, Size etc. we can do validations on the input received. Now let’s try to define custom validations that are specific to our business requirements. For the same we need to follow the below steps,
+
+    Step 1: Suppose if we have a requirement to not allow some weak passwords inside our user registration form, we first need to create a custom annotation like below. Here we need to provide the class name where the actual validation logic present.
+    @Documented
+    @Constraint(validatedBy = PasswordStrengthValidator.class)
+    @Target({ ElementType.METHOD, ElementType.FIELD })
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface PasswordValidator {
+        String message() default "Please choose a strong password";
+        Class<?>[] groups() default {};
+        Class<? extends Payload>[] payload() default {};
+    }
+
+    Step 2: We need to create a class that implements ConstraintValidator interface and overriding the isValid() method like shown below.
+    public class PasswordStrengthValidator implements 
+        ConstraintValidator<PasswordValidator, String> {
+
+    List<String> weakPasswords;
+
+    @Override
+    public void initialize(PasswordValidator passwordValidator) {
+        weakPasswords = Arrays.asList("12345", "password", "qwerty");
+    }
+
+    @Override
+    public boolean isValid(String passwordField, 
+                           ConstraintValidatorContext cxt) {
+        return passwordField != null && (!weakPasswords.contains(passwordField));
+        }
+    }
+
+    Step 3: Finally we can mention the annotation that we created on top of the field inside a POJO class.
+    @NotBlank(message = "Password must not be blank")
+    @Size(min = 5, message = "Password must be at least 5 characters long")
+    @PasswordValidator
+    private String pwd;
+
+156: Building Custom validations for new user registration page - Part 2
+
+157: Building Custom validations for new user registration page - Part 3
+
+158: Building Custom validations for new user registration page - Part 4
+    We have seen before using Bean validations like Max, Min, Size etc. we can do validations on the input received. Now let’s try to define custom validations that are specific to our business requirements. For the same we need to follow the below steps,
+
+    Step 1: Suppose if we have a requirement to not allow some weak passwords inside our user registration form, we first need to create a custom annotation like below. Here we need to provide the class name where the actual validation logic present.
+    @Documented
+    @Constraint(validatedBy = PasswordStrengthValidator.class)
+    @Target({ ElementType.METHOD, ElementType.FIELD })
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface PasswordValidator {
+        String message() default "Please choose a strong password";
+        Class<?>[] groups() default {};
+        Class<? extends Payload>[] payload() default {};
+    }
 
     
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
