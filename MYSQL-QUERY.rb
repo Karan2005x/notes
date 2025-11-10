@@ -66,3 +66,72 @@ select * from demo_table  where name='Gaurav';
 #We don't want to select viraj so...
 select * from demo_table  
         where name !='Viraj';
+
+#Select with less then greater then
+select * from demo_table
+        where roll >5;
+
+select * from demo_table
+        where roll <=5;
+
+select * from demo_table 
+        where name > 'K';
+Note:- Greater include the value itself like it  also display the word starting with 'K'
+
+select * from demo_table 
+        where name < 'K';
+
+#Is Null and Is Not Null
+select * from demo_table
+        where name is null;
+
+select * from demo_table
+        where name is not null;
+
+#AND operator
+mysql> select * from demo_table where name ='Raj'
+    -> and roll = 15;
++------+------+
+| name | roll |
++------+------+
+| Raj  |   15 |
++------+------+
+1 row in set (0.00 sec)
+
+mysql> select * from demo_table where name ='Raj' and roll = 14;
+Empty set (0.00 sec)
+
+mysql> select * from demo_table where name ='Raj' and roll = 16;
++------+------+
+| name | roll |
++------+------+
+| Raj  |   16 |
++------+------+
+1 row in set (0.00 sec)
+
+#OR operator
+mysql> select * from demo_table where name ='Raj' or roll = 14;
++------+------+
+| name | roll |
++------+------+
+| Raj  |    4 |
+| NULL |   14 |
+| Raj  |   15 |
+| Raj  |   16 |
++------+------+
+4 rows in set (0.00 sec)
+
+#Combination of AND & OR
+mysql> select * from demo_table2
+    -> where address = 'Jaipur'
+    -> And (stu_id = 2 or name = 'Karan');
++--------+--------+---------+------------+----------+
+| stu_id | name   | address | dob        | fees     |
++--------+--------+---------+------------+----------+
+|      1 | Karan  | Jaipur  | NULL       | 50000.00 |
+|      2 | Chandu | Jaipur  | 1998-07-15 | 60000.00 |
++--------+--------+---------+------------+----------+
+2 rows in set (0.00 sec)
+
+
+
