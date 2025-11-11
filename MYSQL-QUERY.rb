@@ -1,5 +1,6 @@
 #SQL Start
-mysql -u root -p
+mysql -u karan -p
+Bamniya@2005
 
 #Create Database
 create database demo_db;
@@ -505,4 +506,147 @@ mysql> select * from incrementdemo;
 | 10 | Karan | Jaipur   |
 +----+-------+----------+
 3 rows in set (0.00 sec)
+
+#ALIAS 
+Note:- Temporarily changing the name of column or table
+mysql> select name as "Student Name" from demo_table; (AS is optional)
++---------------+
+| Student Name  |
++---------------+
+| D.K's Company |
+| K.K's Company |
+| Karan         |
+| Raj           |
+| Gaurav        |
+| Vikas         |
+| Viraj         |
+| Aditya        |
+| Lizza         |
+| Deepak        |
+| Chandu        |
+| NULL          |
+| NULL          |
+| NULL          |
+| Raj           |
+| Raj           |
++---------------+
+16 rows in set (0.00 sec)
+
+#Arithmetic Operators (/*-+)
+
+mysql> select stid, name, mark,mark+100 as "New Marks"from student;
++------+-------+------+-----------+
+| stid | name  | mark | New Marks |
++------+-------+------+-----------+
+|    1 | Rahul |  300 |       400 |
+|    2 | Rani  |  250 |       350 |
+|    3 | Soni  |  320 |       420 |
+|    4 | Jai   |  255 |       355 |
+|    5 | Rock  |  150 |       250 |
+|    6 | Sonam |  145 |       245 |
++------+-------+------+-----------+
+6 rows in set (0.00 sec)
+
+#DISTINCT
+Note:- Does not display duplicate values
+
+mysql> select distinct emp_name as employees from demo_table3;
++-----------+
+| employees |
++-----------+
+| Ram       |
+| Amit      |
+| Tanu      |
+| Sunil     |
+| Sonam     |
+| Komal     |
+| Vinay     |
+| Dev       |
+| Suhana    |
+| Puja      |
+| Raja      |
+| Jai       |
++-----------+
+12 rows in set (0.01 sec)
+
+#ALTER
+mysql> Alter table demo_table3
+    -> add column m_no int (11);
+Query OK, 0 rows affected, 1 warning (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+#ADD Column by position (By default column will be added at last)
+mysql> alter table demo_table
+    -> add column stu_id int (5) FIRST;
+Query OK, 0 rows affected, 1 warning (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+mysql> select * from demo_table;
++--------+---------------+------+
+| stu_id | name          | roll |
++--------+---------------+------+
+|   NULL | D.K's Company |    1 |
+|   NULL | K.K's Company |    2 |
+|   NULL | Karan         |    3 |
+|   NULL | Raj           |    4 |
+|   NULL | Gaurav        |    5 |
+|   NULL | Vikas         |    6 |
+|   NULL | Viraj         |    7 |
+|   NULL | Aditya        |    8 |
+|   NULL | Lizza         |    9 |
+|   NULL | Deepak        |   10 |
+|   NULL | Chandu        |   11 |
+|   NULL | NULL          |   12 |
+|   NULL | NULL          |   13 |
+|   NULL | NULL          |   14 |
+|   NULL | Raj           |   15 |
+|   NULL | Raj           |   16 |
++--------+---------------+------+
+16 rows in set (0.00 sec)
+
+mysql> alter table demo_table
+    -> add column last_name varchar (50) AFTER name;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from demo_table;
++--------+---------------+-----------+------+
+| stu_id | name          | last_name | roll |
++--------+---------------+-----------+------+
+|   NULL | D.K's Company | NULL      |    1 |
+|   NULL | K.K's Company | NULL      |    2 |
+|   NULL | Karan         | NULL      |    3 |
+|   NULL | Raj           | NULL      |    4 |
+|   NULL | Gaurav        | NULL      |    5 |
+|   NULL | Vikas         | NULL      |    6 |
+|   NULL | Viraj         | NULL      |    7 |
+|   NULL | Aditya        | NULL      |    8 |
+|   NULL | Lizza         | NULL      |    9 |
+|   NULL | Deepak        | NULL      |   10 |
+|   NULL | Chandu        | NULL      |   11 |
+|   NULL | NULL          | NULL      |   12 |
+|   NULL | NULL          | NULL      |   13 |
+|   NULL | NULL          | NULL      |   14 |
+|   NULL | Raj           | NULL      |   15 |
+|   NULL | Raj           | NULL      |   16 |
++--------+---------------+-----------+------+
+16 rows in set (0.01 sec)
+
+mysql> alter table items
+    -> add column item_n int (5) not null auto_increment,
+    -> add primary key (item_n);
+Query OK, 0 rows affected, 1 warning (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+mysql> select * from items;
++--------+---------+--------+
+| name   | item_no | item_n |
++--------+---------+--------+
+| Mobile |       0 |      1 |
+| Laptop |       0 |      2 |
+| TV     |       0 |      3 |
+| PC     |       0 |      4 |
+| Cam    |       0 |      5 |
++--------+---------+--------+
+5 rows in set (0.00 sec)
 
