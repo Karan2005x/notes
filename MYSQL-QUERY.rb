@@ -650,3 +650,319 @@ mysql> select * from items;
 +--------+---------+--------+
 5 rows in set (0.00 sec)
 
+#ALTER table adding constraint
+mysql> alter table items  
+    -> add constraint unique key (seller_id);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+#Changing column name and its data type
+mysql> alter table items
+    -> change column name p_name varchar (50);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+#Changing many columns at a time
+mysql> alter table items
+    -> change column seller_id sale_id int (8),
+    -> change column p_name product_name varchar (50);
+Query OK, 0 rows affected, 1 warning (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+#Changing column name and its data type with constraints
+mysql> alter table test 
+    -> change column id stu_id int (10) not null,
+    -> add primary key (stu_id);
+Query OK, 0 rows affected, 1 warning (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+#Changing column data type
+mysql> alter table test 
+    -> modify column name char (40);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc test;
++--------+----------+------+-----+---------+-------+
+| Field  | Type     | Null | Key | Default | Extra |
++--------+----------+------+-----+---------+-------+
+| stu_id | int      | NO   | PRI | NULL    |       |
+| name   | char(40) | YES  |     | NULL    |       |
++--------+----------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> alter table test  modify column name char (40) not null;
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc test;
++--------+----------+------+-----+---------+-------+
+| Field  | Type     | Null | Key | Default | Extra |
++--------+----------+------+-----+---------+-------+
+| stu_id | int      | NO   | PRI | NULL    |       |
+| name   | char(40) | NO   |     | NULL    |       |
++--------+----------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+#For deleting the unique key we have to delete its index
+mysql> desc test;
++-------+------+------+-----+---------+-------+
+| Field | Type | Null | Key | Default | Extra |
++-------+------+------+-----+---------+-------+
+| id    | int  | YES  | UNI | NULL    |       |
++-------+------+------+-----+---------+-------+
+1 row in set (0.01 sec)
+
+mysql> alter table test  drop index id_2;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc test;
++-------+------+------+-----+---------+-------+
+| Field | Type | Null | Key | Default | Extra |
++-------+------+------+-----+---------+-------+
+| id    | int  | YES  |     | NULL    |       |
++-------+------+------+-----+---------+-------+
+1 row in set (0.00 sec)
+
+#Drop table or delete table
+mysql> create table my_table ( name varchar (30), id int (11) not null primary key );
+Query OK, 0 rows affected, 1 warning (0.05 sec)
+
+mysql> desc my_table;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| name  | varchar(30) | YES  |     | NULL    |       |
+| id    | int         | NO   | PRI | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> drop table my_table;
+Query OK, 0 rows affected (0.02 sec)
+
+#TRUNCATE TABLE used to delete the data not the table
+mysql> select * from people;
++----+---------+--------------+
+| id | name    | city         |
++----+---------+--------------+
+|  1 | Alice   | New York     |
+|  2 | Bob     | Los Angeles  |
+|  3 | Charlie | Chicago      |
+|  4 | David   | Houston      |
+|  5 | Eva     | Phoenix      |
+|  6 | Frank   | Philadelphia |
+|  7 | Grace   | San Antonio  |
+|  8 | Hannah  | San Diego    |
+|  9 | Ian     | Dallas       |
+| 10 | Julia   | San Jose     |
++----+---------+--------------+
+10 rows in set (0.00 sec)
+
+mysql> truncate table people;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> select * from people;
+Empty set (0.00 sec)
+
+#Rename table in sql
+mysql> rename table people to employees;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> select * from employees;
+Empty set (0.00 sec)
+
+mysql> select * from people;
+ERROR 1146 (42S02): Table 'demo_db.people' doesn't exist                    '
+
+#Alter database
+Alter database enables you to change the overall characteristics of a database. These characteristics are stored in db.opt file in the database directory. To use ALTER DATABASE, you need the alter privilege on the database.
+
+Alter Schema is a synonym fir Alter Database. The database name can be omitted from the syntax, in which case the statement applies to the default database.
+
+Syntax:- ALTER DATABASE database_name;
+Ex:- ALTER DATABASE db;
+
+#DROP DATABASE
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| demo_db            |
+| information_schema |
+| karan              |
+| mysql              |
+| performance_schema |
+| rating_System      |
+| sys                |
+| test               |
++--------------------+
+8 rows in set (0.00 sec)
+
+mysql> drop database test;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| demo_db            |
+| information_schema |
+| karan              |
+| mysql              |
+| performance_schema |
+| rating_System      |
+| sys                |
++--------------------+
+7 rows in set (0.00 sec)
+
+#SHOW COLUMNS
+mysql> show columns from demo_table;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| stu_id    | int         | YES  |     | NULL    |       |
+| name      | varchar(50) | YES  |     | NULL    |       |
+| last_name | varchar(50) | YES  |     | NULL    |       |
+| roll      | int         | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+#SHOW CREATE DATABASE
+Shows the command that we used to write when creating the database
+mysql> show create database demo_db;
++----------+-----------------------------------------------------------------------------------------------------------------------------------+
+| Database | Create Database                                                                                                                   |
++----------+-----------------------------------------------------------------------------------------------------------------------------------+
+| demo_db  | CREATE DATABASE `demo_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */ |
++----------+-----------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+#SHOW CREATE TABLE
+mysql> show create table employees;
++-----------+---------------------------------------------------------------+
+| Table     | Create Table                                                  |
++-----------+---------------------------------------------------------------+
+| employees | CREATE TABLE `employees` (                                    |
+|  `id` int NOT NULL AUTO_INCREMENT,                                        |
+| `name` varchar(50) DEFAULT NULL,                                          |
+| `city` varchar(50) DEFAULT NULL,                                          |
+| PRIMARY KEY (`id`)                                                        |
+| )                                                                         |
+| ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci          |
++-----------+---------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+#UPDATING RECORDS IN TABLE
+mysql> update demo_table3 
+set m_no = 787890 
+where emp_id = 101;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+#UPDATE WITH CASE
+mysql> update student
+    -> set result =
+    -> case
+    -> when mark >= 300 then 'FIRST'
+    -> when mark <300 and mark  >=250 then 'SECOND'
+    -> when mark <250 and mark  >=150 then 'THIRD'
+    -> else 'FAIL'
+    -> end;
+Query OK, 6 rows affected (0.01 sec)
+Rows matched: 6  Changed: 6  Warnings: 0
+
+mysql> select * from student;
++------+-------+---------+------+--------+
+| stid | name  | city    | mark | result |
++------+-------+---------+------+--------+
+|    1 | Rahul | Delhi   |  300 | FIRST  |
+|    2 | Rani  | Chennai |  250 | SECOND |
+|    3 | Soni  | Ranchi  |  320 | FIRST  |
+|    4 | Jai   | Hyd     |  255 | SECOND |
+|    5 | Rock  | Mumbai  |  150 | THIRD  |
+|    6 | Sonam | Patna   |  145 | FAIL   |
++------+-------+---------+------+--------+
+6 rows in set (0.00 sec)
+
+#DELETING A SINGLE RECORD
+mysql> delete from student 
+    -> where stid = 1;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from student;
++------+-------+---------+------+--------+
+| stid | name  | city    | mark | result |
++------+-------+---------+------+--------+
+|    2 | Rani  | Chennai |  250 | SECOND |
+|    3 | Soni  | Ranchi  |  320 | FIRST  |
+|    4 | Jai   | Hyd     |  255 | SECOND |
+|    5 | Rock  | Mumbai  |  150 | THIRD  |
+|    6 | Sonam | Patna   |  145 | FAIL   |
++------+-------+---------+------+--------+
+5 rows in set (0.00 sec)
+
+#Copy old table to new table
+Within same database
+mysql> select * from student;
++------+-------+---------+------+--------+
+| stid | name  | city    | mark | result |
++------+-------+---------+------+--------+
+|    2 | Rani  | Chennai |  250 | SECOND |
+|    3 | Soni  | Ranchi  |  320 | FIRST  |
+|    4 | Jai   | Hyd     |  255 | SECOND |
+|    5 | Rock  | Mumbai  |  150 | THIRD  |
+|    6 | Sonam | Patna   |  145 | FAIL   |
++------+-------+---------+------+--------+
+5 rows in set (0.00 sec)
+
+mysql> create table studentoftenth like student;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert studentoftenth select * from student;
+Query OK, 5 rows affected (0.02 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> select * from studentoftenth;
++------+-------+---------+------+--------+
+| stid | name  | city    | mark | result |
++------+-------+---------+------+--------+
+|    2 | Rani  | Chennai |  250 | SECOND |
+|    3 | Soni  | Ranchi  |  320 | FIRST  |
+|    4 | Jai   | Hyd     |  255 | SECOND |
+|    5 | Rock  | Mumbai  |  150 | THIRD  |
+|    6 | Sonam | Patna   |  145 | FAIL   |
++------+-------+---------+------+--------+
+5 rows in set (0.00 sec)
+
+In Other database
+mysql> use demo_db2; (Use the database where you want to create the table)
+Database changed
+
+mysql> create table student like demo_db.student; (Creating table)
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert student select * from demo_db.student; (Inserting data)
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++--------------------+
+| Tables_in_demo_db2 |
++--------------------+
+| student            |
++--------------------+
+1 row in set (0.01 sec)
+
+mysql> select * from student;
++------+-------+---------+------+--------+
+| stid | name  | city    | mark | result |
++------+-------+---------+------+--------+
+|    2 | Rani  | Chennai |  250 | SECOND |
+|    3 | Soni  | Ranchi  |  320 | FIRST  |
+|    4 | Jai   | Hyd     |  255 | SECOND |
+|    5 | Rock  | Mumbai  |  150 | THIRD  |
+|    6 | Sonam | Patna   |  145 | FAIL   |
++------+-------+---------+------+--------+
+5 rows in set (0.00 sec)
+
