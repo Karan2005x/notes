@@ -1091,3 +1091,232 @@ mysql> select * , round(price,1) from product;
 +----+----------+----------+----------------+
 4 rows in set (0.00 sec)
 
+#COUNT FUNCTION
+mysql> select count(CustID) from Orders;
++---------------+
+| count(CustID) |
++---------------+
+|             8 |
++---------------+
+1 row in set (0.01 sec)
+
+mysql> select count(distinct CustID) from Orders;
++------------------------+
+| count(distinct CustID) |
++------------------------+
+|                      3 |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> select count(CustID) from Orders
+    -> where custid = 101;
++---------------+
+| count(CustID) |
++---------------+
+|             3 |
++---------------+
+1 row in set (0.00 sec)
+
+#UPPER AND LOWER FUNCTION
+mysql> select upper(emp_name) as NAME from employees;
++--------+
+| NAME   |
++--------+
+| RAM    |
+| AMIT   |
+| TANU   |
+| SUNIL  |
+| SONAM  |
+| KOMAL  |
+| VINAY  |
+| DEV    |
+| SUHANA |
+| PUJA   |
+| RAJA   |
+| JAI    |
+| SONAM  |
+| DEV    |
+| PUJA   |
++--------+
+15 rows in set (0.01 sec)
+
+mysql> select lower(emp_name) as name from employees;
++--------+
+| name   |
++--------+
+| ram    |
+| amit   |
+| tanu   |
+| sunil  |
+| sonam  |
+| komal  |
+| vinay  |
+| dev    |
+| suhana |
+| puja   |
+| raja   |
+| jai    |
+| sonam  |
+| dev    |
+| puja   |
++--------+
+15 rows in set (0.00 sec)
+
+#MID AND LENGTH FUNCTION
+mysql> select mid(city,1,3) as shortcity from employees;
++-----------+
+| shortcity |
++-----------+
+| Del       |
+| Mum       |
+| Del       |
+| Kol       |
+| Kol       |
+| Ran       |
+| Kol       |
+| Mum       |
+| Ran       |
+| Ban       |
+| Pat       |
+| Che       |
+| J&K       |
+| Che       |
+| Mum       |
++-----------+
+15 rows in set (0.00 sec)
+
+mysql> select city, Length(city) from employees;
++----------+--------------+
+| city     | Length(city) |
++----------+--------------+
+| Delhi    |            5 |
+| Mumbai   |            6 |
+| Delhi    |            5 |
+| Kolkata  |            7 |
+| Kolkata  |            7 |
+| Ranchi   |            6 |
+| Kolkata  |            7 |
+| Mumbai   |            6 |
+| Ranchi   |            6 |
+| Banglore |            8 |
+| Patna    |            5 |
+| Chennai  |            7 |
+| J&K      |            3 |
+| Chennai  |            7 |
+| Mumbai   |            6 |
++----------+--------------+
+15 rows in set (0.00 sec)
+
+#CONCAT FUNCTION
+mysql> select emp_name, concat(city,' ',pin) as concat from employees;
++----------+-----------------+
+| emp_name | concat          |
++----------+-----------------+
+| Ram      | Delhi 800001    |
+| Amit     | Mumbai 800002   |
+| Tanu     | Delhi 800001    |
+| Sunil    | Kolkata 800003  |
+| Sonam    | Kolkata 800003  |
+| Komal    | Ranchi 800004   |
+| Vinay    | Kolkata 800003  |
+| Dev      | Mumbai 800002   |
+| Suhana   | Ranchi 800004   |
+| Puja     | Banglore 800005 |
+| Raja     | Patna 800007    |
+| Jai      | Chennai 800009  |
+| Sonam    | J&K 800008      |
+| Dev      | Chennai 800009  |
+| Puja     | Mumbai 800002   |
++----------+-----------------+
+15 rows in set (0.01 sec)
+
+#REVERSE FUNCTION
+mysql> select reverse (city) from employees;
++----------------+
+| reverse (city) |
++----------------+
+| ihleD          |
+| iabmuM         |
+| ihleD          |
+| atakloK        |
+| atakloK        |
+| ihcnaR         |
+| atakloK        |
+| iabmuM         |
+| ihcnaR         |
+| erolgnaB       |
+| antaP          |
+| iannehC        |
+| K&J            |
+| iannehC        |
+| iabmuM         |
++----------------+
+15 rows in set (0.00 sec)
+
+#NOW FUNCTION
+mysql> select emp_name, salary, NOW() as DateTime from employees;
++----------+--------+---------------------+
+| emp_name | salary | DateTime            |
++----------+--------+---------------------+
+| Ram      |  50000 | 2025-11-13 23:02:39 |
+| Amit     |  45000 | 2025-11-13 23:02:39 |
+| Tanu     |  15000 | 2025-11-13 23:02:39 |
+| Sunil    |  30000 | 2025-11-13 23:02:39 |
+| Sonam    |  10000 | 2025-11-13 23:02:39 |
+| Komal    |  35000 | 2025-11-13 23:02:39 |
+| Vinay    |  35000 | 2025-11-13 23:02:39 |
+| Dev      |  30000 | 2025-11-13 23:02:39 |
+| Suhana   |  30000 | 2025-11-13 23:02:39 |
+| Puja     |  35000 | 2025-11-13 23:02:39 |
+| Raja     |  15000 | 2025-11-13 23:02:39 |
+| Jai      |  20000 | 2025-11-13 23:02:39 |
+| Sonam    |  20000 | 2025-11-13 23:02:39 |
+| Dev      |  25000 | 2025-11-13 23:02:39 |
+| Puja     |  25000 | 2025-11-13 23:02:39 |
++----------+--------+---------------------+
+15 rows in set (0.00 sec)
+
+#GROUP BY FUNCTION
+mysql> select emp_name, MIN(salary) from employees group by emp_name;
++----------+-------------+
+| emp_name | MIN(salary) |
++----------+-------------+
+| Ram      |       50000 |
+| Amit     |       45000 |
+| Tanu     |       15000 |
+| Sunil    |       30000 |
+| Sonam    |       10000 |
+| Komal    |       35000 |
+| Vinay    |       35000 |
+| Dev      |       25000 |
+| Suhana   |       30000 |
+| Puja     |       25000 |
+| Raja     |       15000 |
+| Jai      |       20000 |
++----------+-------------+
+12 rows in set (0.00 sec)
+
+mysql> select custid, count(*) from Orders group by custid;
++--------+----------+
+| custid | count(*) |
++--------+----------+
+|    101 |        3 |
+|    102 |        2 |
+|    103 |        3 |
++--------+----------+
+3 rows in set (0.00 sec)
+
+#HAVING CLAUSE
+mysql> select emp_name, min(salary) from employees group by emp_name having min(salary) > 25000;
++----------+-------------+
+| emp_name | min(salary) |
++----------+-------------+
+| Ram      |       50000 |
+| Amit     |       45000 |
+| Sunil    |       30000 |
+| Komal    |       35000 |
+| Vinay    |       35000 |
+| Suhana   |       30000 |
++----------+-------------+
+6 rows in set (0.00 sec)
+
