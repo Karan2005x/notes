@@ -966,3 +966,128 @@ mysql> select * from student;
 +------+-------+---------+------+--------+
 5 rows in set (0.00 sec)
 
+#MIN and MAX Function
+mysql> select min(salary) from employees;
++-------------+
+| min(salary) |
++-------------+
+|       10000 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> select max(salary) from employees;
++-------------+
+| max(salary) |
++-------------+
+|       50000 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> select min(salary) as 'MINIMUM SALARY' from employees;
++----------------+
+| MINIMUM SALARY |
++----------------+
+|          10000 |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> select max(salary) as 'MAXIMUM SALARY' from employees;
++----------------+
+| MAXIMUM SALARY |
++----------------+
+|          50000 |
++----------------+
+1 row in set (0.00 sec)
+
+#SUM AND AVG FUNCTION
+mysql> select SUM(salary) as 'TOTAL SALARY' from employees;
++--------------+
+| TOTAL SALARY |
++--------------+
+|       420000 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select AVG(salary) as 'AVERAGE SALARY' from employees;
++----------------+
+| AVERAGE SALARY |
++----------------+
+|     28000.0000 |
++----------------+
+1 row in set (0.00 sec)
+
+#SQRT FUNCTION
+mysql> select salary, sqrt(salary) as 'square root of salary'  from  employees;
++--------+-----------------------+
+| salary | square root of salary |
++--------+-----------------------+
+|  50000 |    223.60679774997897 |
+|  45000 |    212.13203435596427 |
+|  15000 |    122.47448713915891 |
+|  30000 |    173.20508075688772 |
+|  10000 |                   100 |
+|  35000 |    187.08286933869707 |
+|  35000 |    187.08286933869707 |
+|  30000 |    173.20508075688772 |
+|  30000 |    173.20508075688772 |
+|  35000 |    187.08286933869707 |
+|  15000 |    122.47448713915891 |
+|  20000 |     141.4213562373095 |
+|  20000 |     141.4213562373095 |
+|  25000 |    158.11388300841898 |
+|  25000 |    158.11388300841898 |
++--------+-----------------------+
+15 rows in set (0.00 sec)
+
+#DECIMAL DATATYPE
+mysql> create table product 
+    -> (
+    -> id int auto_increment primary key,
+    -> pname varchar (40),
+    -> price decimal (7,2) not null
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> desc product;
++-------+--------------+------+-----+---------+----------------+
+| Field | Type         | Null | Key | Default | Extra          |
++-------+--------------+------+-----+---------+----------------+
+| id    | int          | NO   | PRI | NULL    | auto_increment |
+| pname | varchar(40)  | YES  |     | NULL    |                |
+| price | decimal(7,2) | NO   |     | NULL    |                |
++-------+--------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> insert into product (pname,price)
+    -> values ("Mobile",69999.55),
+    -> ("Computer",16000.56),
+    -> ("Laptop",25000.00),
+    -> ("Printer",10000.23);
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from  product;
++----+----------+----------+
+| id | pname    | price    |
++----+----------+----------+
+|  1 | Mobile   | 69999.55 |
+|  2 | Computer | 16000.56 |
+|  3 | Laptop   | 25000.00 |
+|  4 | Printer  | 10000.23 |
++----+----------+----------+
+4 rows in set (0.00 sec)
+
+Note:- ZEROFILL used to add zero after and before of the data to show that this is price or value.
+
+#ROUND FUNCTION (Basically round ups the data if 2.4 then it is 2 and if 2.5 or 2.5-2.9 then it include it as 3)
+mysql> select * , round(price,1) from product;
++----+----------+----------+----------------+
+| id | pname    | price    | round(price,1) |
++----+----------+----------+----------------+
+|  1 | Mobile   | 69999.55 |        69999.6 |
+|  2 | Computer | 16000.56 |        16000.6 |
+|  3 | Laptop   | 25000.00 |        25000.0 |
+|  4 | Printer  | 10000.23 |        10000.2 |
++----+----------+----------+----------------+
+4 rows in set (0.00 sec)
+
