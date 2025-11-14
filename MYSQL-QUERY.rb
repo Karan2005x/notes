@@ -1320,3 +1320,42 @@ mysql> select emp_name, min(salary) from employees group by emp_name having min(
 +----------+-------------+
 6 rows in set (0.00 sec)
 
+#ONE-TO-ONE RELATIONSHIP
++-------------+        +-------------+
+|   USERS     |        | USER_PROFILE|
++-------------+        +-------------+
+| id (PK)     |<------>| user_id (PK, FK)
+| username    |        | bio
+| email       |        | avatar_url
++-------------+        +-------------+
+
+Explanation:
+One user has exactly one profile, and one profile belongs to exactly one user.
+
+#ONE-TO-MANY RELATIONSHIP
++-------------+        +-------------+
+|  CUSTOMERS  |        |   ORDERS    |
++-------------+        +-------------+
+| id (PK)     |<------>| customer_id (FK)
+| name        |        | order_date
+| email       |        | amount
++-------------+        +-------------+
+
+Explanation:
+One customer can have many orders, but each order belongs to one customer.
+
+#MANY-TO-MANY RELATIONSHIP
++-------------+        +-----------------+        +-------------+
+|  STUDENTS   |        | STUDENT_COURSES |        |   COURSES   |
++-------------+        +-----------------+        +-------------+
+| id (PK)     |<------>| student_id (FK) |------->| id (PK)
+| name        |        | course_id  (FK) |<-------| title
+| major       |        +-----------------+        | credits
++-------------+                                     +-------------+
+
+Explanation:
+A student can enroll in many courses and a course can have many students.
+NOTE :- IN THIS RELATIONSHIP WE HAVE TO CREATE A JUNCTION TABLE TO MAKE CONNECTIVITY BETWEEN OR AMONG BOTH TABLES.
+
+#NF (NORMALISATION FORM)
+USED TO REMOVE REDUNDANCY OF THE TABLE
