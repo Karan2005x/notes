@@ -1359,3 +1359,106 @@ NOTE :- IN THIS RELATIONSHIP WE HAVE TO CREATE A JUNCTION TABLE TO MAKE CONNECTI
 
 #NF (NORMALISATION FORM)
 USED TO REMOVE REDUNDANCY OF THE TABLE
+
+#FOREIGN KEY
+A FOREIGN KEY in one table points to a PRIMARY KEY in another table.
+
+A foreign key can have a different name than the primary key it comes from.
+
+The primary key used by a foreign key is also known as a parent key. The table where the primary key is from is known as a parent table.
+
+The foreign key can be used to make sure that the row in one table has a corresponding row in another table.
+
+Foreign key value can be null, even though primary key value can not.
+
+Foreign key does not have to be unique — in fact, they often are not.
+
++--------+-------+--------+        +--------+--------+--------+
+| Emp_ID | Name  | Addres |        | Dep_ID | DName  | Emp_ID |
++--------+-------+--------+        +--------+--------+--------+
+|   1    | Rani  | Delhi  |        |   1    | IT     |   1    |
+|   2    | Jay   | Mum    |        |   2    | HR     |   1    |
+|   3    | Veeru | Kol    |        |   3    | Admin  |   2    |
++--------+-------+--------+        +--------+--------+--------+
+
+mysql> create table employee
+    -> (
+    -> eid int not null auto_increment primary key,
+    -> ename varchar (40),
+    -> address varchar (40)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> desc employee;
++---------+-------------+------+-----+---------+----------------+
+| Field   | Type        | Null | Key | Default | Extra          |
++---------+-------------+------+-----+---------+----------------+
+| eid     | int         | NO   | PRI | NULL    | auto_increment |
+| ename   | varchar(40) | YES  |     | NULL    |                |
+| address | varchar(40) | YES  |     | NULL    |                |
++---------+-------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> create table department
+    -> (
+    -> did int not null auto_increment primary key,
+    -> dname varchar(40),
+    -> empid int not null,
+    -> constraint employee_eid_fk
+    -> foreign key (empid) references employee(eid));
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> desc department;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| did   | int         | NO   | PRI | NULL    | auto_increment |
+| dname | varchar(40) | YES  |     | NULL    |                |
+| empid | int         | NO   | MUL | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+#FINDING CONSTRAINT NAME
+mysql> select * from information_schema.table_constraints
+    -> where table_name = 'department';
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+| CONSTRAINT_CATALOG | CONSTRAINT_SCHEMA | CONSTRAINT_NAME | TABLE_SCHEMA | TABLE_NAME | CONSTRAINT_TYPE | ENFORCED |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+| def                | demo_db           | PRIMARY         | demo_db      | department | PRIMARY KEY     | YES      |
+| def                | demo_db           | employee_eid_fk | demo_db      | department | FOREIGN KEY     | YES      |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+2 rows in set (0.01 sec)
+
+#DROP FOREIGN KEY
+mysql> alter table department 
+    -> drop foreign key employee_eid_fk;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from information_schema.table_constraints where table_name = 'department';
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+| CONSTRAINT_CATALOG | CONSTRAINT_SCHEMA | CONSTRAINT_NAME | TABLE_SCHEMA | TABLE_NAME | CONSTRAINT_TYPE | ENFORCED |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+| def                | demo_db           | PRIMARY         | demo_db      | department | PRIMARY KEY     | YES      |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+1 row in set (0.01 sec)
+
+#ADD FOREIGN KEY CONSTRAINT
+mysql> alter table department 
+    -> add constraint employee_eid_fk
+    -> foreign key(empid) references employee(eid);
+Query OK, 0 rows affected (0.10 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from information_schema.table_constraints where table_name = 'department';
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+| CONSTRAINT_CATALOG | CONSTRAINT_SCHEMA | CONSTRAINT_NAME | TABLE_SCHEMA | TABLE_NAME | CONSTRAINT_TYPE | ENFORCED |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+| def                | demo_db           | PRIMARY         | demo_db      | department | PRIMARY KEY     | YES      |
+| def                | demo_db           | employee_eid_fk | demo_db      | department | FOREIGN KEY     | YES      |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+----------+
+2 rows in set (0.01 sec)
+
+#PARENT TABLE DELETE PROBLEM
+Note :- If we want to delete a parent table, we can not because parent table has another child table so we have to first delete child table.
+
