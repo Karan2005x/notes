@@ -1462,3 +1462,114 @@ mysql> select * from information_schema.table_constraints where table_name = 'de
 #PARENT TABLE DELETE PROBLEM
 Note :- If we want to delete a parent table, we can not because parent table has another child table so we have to first delete child table.
 
+#PARENT TABLE RECORD
+Note :- We can not directly delete parent table record because they are associated with child table so firstly we have to delete child table records then we are able to delete parent table records.
+
+#ON DELETE CLAUSE
+-> ON DELETE CASCADE (Used when we delete parent record then child records will be auto deleted)
+
+mysql> create table department
+    -> (
+    -> did int not null auto_increment primary key,
+    -> dname varchar (40),
+    -> empid int not null,
+    -> constraint employee_eid_fk
+    -> foreign key (empid) references employee (eid)
+    -> on delete cascade
+    -> );
+
+mysql> select * from employee;
++-----+-------+---------+
+| eid | ename | address |
++-----+-------+---------+
+|   1 | Rani  | Delhi   |
+|   2 | Sumit | Kol     |
+|   3 | Sonam | Hyd     |
+|   4 | Priti | Mum     |
+|   5 | Kunal | Kol     |
++-----+-------+---------+
+5 rows in set (0.01 sec)
+
+mysql> select * from department;
++-----+-------+-------+
+| did | dname | empid |
++-----+-------+-------+
+|   1 | IT    |     1 |
+|   2 | HR    |     1 |
+|   3 | ADMIN |     1 |
+|   4 | IT    |     2 |
+|   5 | EXE   |     2 |
+|   6 | IT    |     3 |
+|   7 | EXE   |     3 |
+|   8 | IT    |     4 |
+|   9 | HR    |     5 |
++-----+-------+-------+
+9 rows in set (0.00 sec)
+
+mysql> delete from employee
+    -> where eid =1;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from employee;
++-----+-------+---------+
+| eid | ename | address |
++-----+-------+---------+
+|   2 | Sumit | Kol     |
+|   3 | Sonam | Hyd     |
+|   4 | Priti | Mum     |
+|   5 | Kunal | Kol     |
++-----+-------+---------+
+4 rows in set (0.00 sec)
+
+mysql> select * from department;
++-----+-------+-------+
+| did | dname | empid |
++-----+-------+-------+
+|   4 | IT    |     2 |
+|   5 | EXE   |     2 |
+|   6 | IT    |     3 |
+|   7 | EXE   |     3 |
+|   8 | IT    |     4 |
+|   9 | HR    |     5 |
++-----+-------+-------+
+6 rows in set (0.00 sec)
+
+-> ON DELETE SET NULL
+(When we delete parent table then child table foreign key will be null only others records will stay as it is)
+create table department ( 
+    did int not null auto_increment primary key, 
+    dname varchar (40), 
+    empid int, 
+    constraint employee_eid_fk foreign key (empid) 
+    references employee (eid) 
+    on delete set null );
+
+insert into department (dname,empid)
+    values ('IT',1),
+    ('HR',1),
+    ('ADMIN',1),
+    ('IT',2),
+    ('EXE',2),
+    ('IT',3),
+    ('EXE',3),
+    ('IT',4),
+    ('HR',5);
+
+-> ON DELETE NO ACTION
+-> ON DELETE RESTRICT
+(We can not delete parent table records, it creates restriction) 
+Note :- It is by default in RDBMS
+create table department ( 
+    did int not null auto_increment primary key, 
+    dname varchar (40), 
+    empid int, 
+    constraint employee_eid_fk foreign key (empid) 
+    references employee (eid) 
+    on delete set null );
+
+#ON UPDATE CLAUSE
+-> ON UPDATE CASCADE
+-> ON UPDATE SET NULL
+-> ON UPDATE NO ACTION
+-> ON UPDATE RESTRICT
+
