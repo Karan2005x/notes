@@ -1569,7 +1569,53 @@ create table department (
 
 #ON UPDATE CLAUSE
 -> ON UPDATE CASCADE
+Note :- It means if you are making some changes in parent table then the records of the child table will also update.
+mysql> create table department 
+    ( 
+    did int not null auto_increment primary key, 
+    dname varchar (40), 
+    empid int, 
+    constraint employee_eid_fk 
+    foreign key (empid) references employee (eid) 
+    on update cascade );
+Query OK, 0 rows affected (0.05 sec)
+
 -> ON UPDATE SET NULL
+Note :- If we are making changes in parent table then the records of the child table will be null.
+mysql> create table department 
+    ( 
+    did int not null auto_increment primary key, 
+    dname varchar (40), 
+    empid int, 
+    constraint employee_eid_fk 
+    foreign key (empid) references employee (eid) 
+    on update set null 
+    );
+Query OK, 0 rows affected (0.07 sec)
+
+Below clauses are by default
 -> ON UPDATE NO ACTION
 -> ON UPDATE RESTRICT
 
+#Composite Key
+When we create a primary key using two or more column then we call it as Composite key.
+
+#JOIN TABLE
+When we want to join two table one table must contain primary key and one should contain foreign key.
+
+#CROSS JOIN
+mysql> select name, depname from employee cross join department;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Jay   | IT      |
+| Krish | IT      |
+| Rahul | IT      |
+| Jay   | HR      |
+| Krish | HR      |
+| Rahul | HR      |
+| Jay   | ADMIN   |
+| Krish | ADMIN   |
+| Rahul | ADMIN   |
++-------+---------+
+9 rows in set (0.00 sec)
