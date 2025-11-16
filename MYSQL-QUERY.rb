@@ -1619,3 +1619,335 @@ mysql> select name, depname from employee cross join department;
 | Rahul | ADMIN   |
 +-------+---------+
 9 rows in set (0.00 sec)
+
+#INNER EQUIJOIN
+mysql> select * from dep;
++-----+---------+-------+
+| did | depname | empid |
++-----+---------+-------+
+| 101 | IT      |     3 |
+| 102 | HR      |     1 |
+| 103 | Admin   |     2 |
++-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select * from emp;
++-------+-------+-------+
+| empid | name  | city  |
++-------+-------+-------+
+|     1 | Rahul | Delhi |
+|     2 | Krish | Kol   |
+|     3 | Jay   | Mum   |
++-------+-------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select emp.name, dep.depname from emp
+    -> inner join dep
+    -> on emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Rahul | HR      |
+| Krish | Admin   |
+| Jay   | IT      |
++-------+---------+
+3 rows in set (0.00 sec)
+
+#INNER NON-EQUIJOIN
+mysql> select * from dep;
++-----+---------+-------+
+| did | depname | empid |
++-----+---------+-------+
+| 101 | IT      |     3 |
+| 102 | HR      |     1 |
+| 103 | Admin   |     2 |
++-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select * from emp;
++-------+-------+-------+
+| empid | name  | city  |
++-------+-------+-------+
+|     1 | Rahul | Delhi |
+|     2 | Krish | Kol   |
+|     3 | Jay   | Mum   |
++-------+-------+-------+
+3 rows in set (0.00 sec)
+
+It shows that which data is not matching like below rahul empid not matching with admin & it so it shows both of the records.
+mysql> select emp.name,dep.depname from dep
+    -> inner join emp
+    -> on emp.empid <> dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Rahul | Admin   |
+| Rahul | IT      |
+| Krish | HR      |
+| Krish | IT      |
+| Jay   | Admin   |
+| Jay   | HR      |
++-------+---------+
+6 rows in set (0.00 sec)
+
+#NATURAL JOIN
+Note :- In this joining foreign key column name and primary key column name must be same.
+
+mysql> select emp.name, dep.depname from dep
+    -> natural join emp;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Jay   | IT      |
+| Rahul | HR      |
+| Krish | Admin   |
++-------+---------+
+3 rows in set (0.01 sec)
+
+mysql> select * from dep;
++-----+---------+-------+
+| did | depname | empid |
++-----+---------+-------+
+| 101 | IT      |     3 |
+| 102 | HR      |     1 |
+| 103 | Admin   |     2 |
++-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select * from emp;
++-------+-------+-------+
+| empid | name  | city  |
++-------+-------+-------+
+|     1 | Rahul | Delhi |
+|     2 | Krish | Kol   |
+|     3 | Jay   | Mum   |
++-------+-------+-------+
+3 rows in set (0.00 sec)
+
+#OUTER JOIN
+Note :- An Outer Join returns all row from one of the tables, along with matching information from another table.
+-> LEFT OUTER JOIN/LEFT JOIN
+    Left Table = Before the Join
+    Right Table = After the Join
+
+    “Actually this is not possible to insert a foreign key record which doesn't have corresponding primary key record
+    So you can't insert a record 10 in foreign key column empid but just in case if it happens It returns NULL”
+
+    mysql> select emp.name, dep.depname from emp
+    -> left join dep
+    -> on emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Rahul | HR      |
+| Krish | Admin   |
+| Jay   | IT      |
++-------+---------+
+3 rows in set (0.00 sec)
+
+mysql> select * from dep;
++-----+---------+-------+
+| did | depname | empid |
++-----+---------+-------+
+| 101 | IT      |     3 |
+| 102 | HR      |     1 |
+| 103 | Admin   |     2 |
++-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select * from emp;
++-------+-------+-------+
+| empid | name  | city  |
++-------+-------+-------+
+|     1 | Rahul | Delhi |
+|     2 | Krish | Kol   |
+|     3 | Jay   | Mum   |
++-------+-------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select emp.name, dep.depname from dep left join emp on emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Jay   | IT      |
+| Rahul | HR      |
+| Krish | Admin   |
++-------+---------+
+3 rows in set (0.00 sec)
+
+-> RIGHT OUTER JOIN/RIGHT JOIN
+mysql> select emp.name, dep.depname from emp right join dep on emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| Jay   | IT      |
+| Rahul | HR      |
+| Krish | Admin   |
++-------+---------+
+3 rows in set (0.01 sec)
+
+-> FULL OUTER JOIN/FULL JOIN
+Note :- This is depracated from the mysql. It shows all the records after joining the table.
+
+#SELF JOIN
+Note :- Self Join is a table joined to itself.
+
+mysql> select e.name AS Name, m.name AS Manager
+    -> from empman e
+    -> inner join empman m
+    -> on e.manid = m.empid;
++-------+---------+
+| Name  | Manager |
++-------+---------+
+| Rahul | Sonam   |
+| Jay   | Sonam   |
+| Sonam | Kunal   |
+| Kunal | Ram     |
+| Ram   | Rani    |
+| Veeru | Rani    |
++-------+---------+
+6 rows in set (0.01 sec)
+
+Note :- Left Join also shows null value that Inner Join do not.
+    mysql> select e.name Name, m.name Manager
+    -> from empman e
+    -> Left Join empman m
+    -> on e.manid = m.empid;
+    +-------+---------+
+    | Name  | Manager |
+    +-------+---------+
+    | Rahul | Sonam   |
+    | Jay   | Sonam   |
+    | Sonam | Kunal   |
+    | Kunal | Ram     |
+    | Ram   | Rani    |
+    | Rani  | NULL    |
+    | Veeru | Rani    |
+    +-------+---------+
+    7 rows in set (0.00 sec)
+
+#Replacing NULL
+1.) IFNULL()
+mysql> select e.name Name, ifnull (m.name, 'No Manager') as Manager
+    -> from empman e
+    -> Left Join empman m
+    -> on e.manid = m.empid;
++-------+------------+
+| Name  | Manager    |
++-------+------------+
+| Rahul | Sonam      |
+| Jay   | Sonam      |
+| Sonam | Kunal      |
+| Kunal | Ram        |
+| Ram   | Rani       |
+| Rani  | No Manager |
+| Veeru | Rani       |
++-------+------------+
+7 rows in set (0.00 sec)
+
+2.) COALESCE()
+mysql> SELECT COALESCE(NULL, 'NO MANAGER') AS EXAMPLE;
++------------+
+| EXAMPLE    |
++------------+
+| NO MANAGER |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select e.name Name, COALESCE (m.name, 'No Manager') as Manager from empma
+n e Left Join empman m on e.manid = m.empid;
++-------+------------+
+| Name  | Manager    |
++-------+------------+
+| Rahul | Sonam      |
+| Jay   | Sonam      |
+| Sonam | Kunal      |
+| Kunal | Ram        |
+| Ram   | Rani       |
+| Rani  | No Manager |
+| Veeru | Rani       |
++-------+------------+
+7 rows in set (0.00 sec)
+
+#UNION
+A Union combines the results of two or more quires into one table.
+
+mysql> select name from student
+    -> union select name from employee;
++-------+
+| name  |
++-------+
+| Rahul |
+| Jay   |
+| Sonam |
+| Kunal |
+| Ram   |
+| Rani  |
+| Veeru |
+| Krish |
++-------+
+8 rows in set (0.00 sec)
+
+mysql> select name from student union select name from employee order by name;
++-------+
+| name  |
++-------+
+| Jay   |
+| Krish |
+| Kunal |
+| Rahul |
+| Ram   |
+| Rani  |
+| Sonam |
+| Veeru |
++-------+
+8 rows in set (0.00 sec)
+
+#UNION ALL
+Note :- Union All returns every matches whether it is duplicate or distinct ones.
+
+mysql> select name from student union all select name from employee order by name;
++-------+
+| name  |
++-------+
+| Jay   |
+| Jay   |
+| Krish |
+| Kunal |
+| Rahul |
+| Rahul |
+| Ram   |
+| Rani  |
+| Sonam |
+| Veeru |
++-------+
+10 rows in set (0.00 sec)
+
+#INTERSECT 
+Note :- Intersect returns only those columns that are in the first query and also in the second query.
+
+mysql> select name from student intersect select name from employee order by name;
++-------+
+| name  |
++-------+
+| Jay   |
+| Rahul |
++-------+
+2 rows in set (0.01 sec)
+
+#EXCEPT
+Note :- Except returns only those columns that are in the first query but not in the second query.
+mysql> select name from student
+    -> except 
+    -> select name from employee;
++-------+
+| name  |
++-------+
+| Sonam |
+| Kunal |
+| Ram   |
+| Rani  |
+| Veeru |
++-------+
+5 rows in set (0.00 sec)
+
