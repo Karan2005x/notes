@@ -1950,4 +1950,3 @@ mysql> select name from student
 | Veeru |
 +-------+
 5 rows in set (0.00 sec)
-
