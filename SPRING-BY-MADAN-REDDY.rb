@@ -1920,23 +1920,1148 @@
         Class<? extends Payload>[] payload() default {};
     }
 
+########################### SECTION 20: DEEP DIVE ON OneToOne RELATIONSHIP, FETCH TYPES, CASCADE TYPES IN ORM FRAMEWORKS ##########################
+
+159: Creating new tables required for new user registration process
+
+160: Spring Data JPA configurations for Person, Address, Roles tables and entities
+
+161: Introduction to One to One Relationship inside ORM frameworks
+
+162: Making One to One Relationship configurations inside entity classes - Theory
+    Spring Data JPA allows developers to build one-to-one relationships between entities with simple configurations. For example, if we want to build a one-to-one between Person and Address entities, then we can configure like mentioned below.
+
+    @Data
+    @Entity
+    public class Person {
+        @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = Address.class)
+        @JoinColumn(name = "address_id", referencedColumnName = "addressId", nullable = true)
+        private Address address;
+    }
+
+    In Spring Data JPA, a one-to-one relationship between two entities is declared by using the @OneToOne annotation. Using it we can configure FetchType, cascade effects, targetEntity.
+
+    The @JoinColumn annotation is used to specify the foreign key column relationship details between the 2 entities. "name" defines the name of the foreign key column, referencedColumnName indicates the field name inside the target entity class, nullable defines whether the foreign key column can be nullable or not.
+
+163: Deep dive on Fetch Types and Cascade Types in ORM frameworks
+    • Based on the fetch configurations that developer has done, JPA allows entities to load the objects with which they have a relationship.
+
+    We can declare the fetch value in the @OneToOne, @OneToMany, @ManyToOne and @ManyToMany annotations. These annotations have an attribute called fetch that serves to indicate the type of fetch we want to perform. It have two valid values: 'FetchType.EAGER and FetchType.LAZY'
+
+    With LAZY configuration, we are telling JPA that we want to lazily load the relation entities, so when retrieving an entity, its relations will not be loaded until unless we try refer the related entity using getter method. On the contrary, with EAGER it will load its relation entities as well.
+
+    By default all ToMany relationships are LAZY, while ToOne relationships are EAGER.
+
+    Key points of Cascade Types
+    Intro to Cascade
+    ✓ JPA allows us to propagate entity state changes from Parents to Child entities. This concept is called Cascading in JPA.
+    ✓ The cascade configuration option accepts an array of CascadeTypes.
+
+    Cascade Types
+    The cascade types supported by JPA are as below:
+    CascadeType.PERSIST
+    CascadeType.MERGE
+    CascadeType.REFRESH
+    CascadeType.REMOVE
+    CascadeType.DETACH
+    CascadeType.ALL
+
+    Best Practices
+    ✓ Cascading makes sense only for Parent–Child associations (where the Parent entity state transition is being cascaded to its Child entities). Cascading from Child to Parent is not very useful and not recommended.
+    ✓ There is no default cascade type in JPA. By default, no operation is cascaded.
+
+    CascadeType.PERSIST
+    Means that save() or persist() operations cascade to related entities.
+
+    CascadeType.MERGE
+    Means that related entities are merged when the owning entity is merged.
+
+    CascadeType.REFRESH
+    Means the child entity also gets reloaded from the database whenever the parent entity is refreshed.
+
+    CascadeType.REMOVE
+    Means propagates the remove operation from parent to child entity.
+
+    CascadeType.DETACH
+    Means detach all child entities if a “manual detach” occurs for parent.
+
+    CascadeType.ALL
+    Is shorthand for all of the above cascade operations.
+
+################################## SECTION 21: SPRING SECURITY CUSTOM AUTHENTICATION USING DB & PASSWORD HASHING #################################
+
+165. Understanding Spring Security configurations for custom authentication logic
+    As of now we are performing the login operation using the inMemoryAuthentication. But the idle way is to perform login check against a DB table or any other storage system which is more secure.
+    For the same, Spring Security allows us to write our own custom logic to authenticate a user based on our requirements by implementing AuthenticationProvider interface. Below is the sample implementation of the same.
+    @Component
+    public class EazySchoolUsernamePwdAuthenticationProvider implements AuthenticationProvider {
+
+        @Override
+        public Authentication authenticate(Authentication authentication)
+                throws AuthenticationException {
+            String name = authentication.getName();
+            String password = authentication.getCredentials().toString();
+            if (authenticateUserBasedonYourRequirement()) {
+                return new UsernamePasswordAuthenticationToken(
+                        name, password, new ArrayList<>());
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public boolean supports(Class<?> authentication) {
+            return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        }
+    }
+
+166. Implement Spring Security changes for custom authentication logic - Part 1
+
+167. Implement Spring Security changes for custom authentication logic - Part 2
+
+168. Problems with Authentication logic using plain text passwords
+
+169. Deep dive on Encoding, Encryption and Hashing for password management
+    Different ways of Pwd management
+    Encoding :-
+    ✓ Encoding is defined as the process of converting data from one form to another and has nothing to do with cryptography.
+    ✓ It involves no secret and completely reversible.
+    ✓ Encoding can’t be used for securing data. Below are the various publicly available algorithms used for encoding.
+    Ex: ASCII, BASE64, UNICODE
+
+    Encryption :-
+    ✓ Encryption is defined as the process of transforming data in such a way that guarantees confidentiality.
+    ✓ To achieve confidentiality, encryption requires the use of a secret which, in cryptographic terms, we call a “key”.
+    ✓ Encryption can be reversible by using decryption with the help of the “key”. As long as the “key” is confidential, encryption can be considered as secured.
+
+    Hashing :-
+    ✓ In hashing, data is converted to the hash value using some hashing function.
+    ✓ Data once hashed is non-reversible. One cannot determine the original data from a hash value generated.
+    ✓ Given some arbitrary data along with the output of a hashing algorithm, one can verify whether this data matches the original input data without needing to see the original data.
+
+170. Deep dive on PasswordEncoder & BCryptPasswordEncoder
+    Do you know Spring Security provides various PasswordEncoders to help developers with hashing of the secured data like password.
+
+    Different Implementations of PasswordEncoders provided by Spring Security
+
+    ✓ NoOpPasswordEncoder (No hashing stores in plain text)
+    ✓ StandardPasswordEncoder
+    ✓ Pbkdf2PasswordEncoder
+    ✓ BCryptPasswordEncoder (Most Commonly used)
+    ✓ SCryptPasswordEncoder
+
+171. Implementing password hashing with BCryptPaswordEncoder - Part 1
+
+172. Implementing password hashing with BCryptPaswordEncoder - Part 2
+
+173. Quick Tip - To Disable the javax validations in Spring Data JPA
+    Do you know we can disable the javax bean validations by the Spring Data JPA using the below property,
+
+    spring.jpa.properties.javax.persistence.validation.mode=none
+
+######################################### SECTION 22: BUILDING PROFILE WEB PAGE INSIDE EAZY SCHOOL WEB APP ########################################
+
+174. Displaying Profile link inside Dashboard web page
+
+175. Displaying Profile Web Page on click of profile link in Dashboard
+
+176. Fetch data from DB and display on the Profile web page
+
+177. Save Address Data into DB from Profile Page
+
+################################### SECTION 23: DEEP DIVE ON ONETOMANY, MANYTOONE RELATIONSHIPS IN ORM FRAMEWORKS #################################
+
+178. Introduction to new enhancements related to OnetoMany, ManytoOne & ManytoMany
+
+179. Displaying Classes, Courses link inside Dashboard web page
+
+180. Introduction to OneToMany & ManyToOne mappings
+    A one-to-many relationship refers to the relationship between two entities/tables A and B in which one element/row of A may only be linked to many elements/rows of B, but a member of B is linked to only one element/row of A.
+
+    The opposite of one-to-many is many-to-one relationship.
+
+    Below are few real-life examples of one-to-many and many-to-one relationships.
+
+    Example 1: CLASS → STUDENTS
+        CLASS
+        |
+        |  One-to-Many
+        v
+    [Student 1]
+    [Student 2]
+    [Student 3]
+
+        ^  
+        |  Many-to-One
+        |
+    (All students belong to one class)
+
+    Example 2: BOOK → PAGES
+        BOOK
+        |
+        |  One-to-Many
+        v
+    [Page 1]
+    [Page 2]
+    [Page 3]
+
+        ^  
+        |  Many-to-One
+        |
+    (Each page belongs to one book)
+
+    • Spring Data JPA allow developers to build one-to-many & many-to-one relationships between the entities with simple configurations.
+    Below are the sample configurations between Class and Persons.
+
+    @Entity
+    public class Person extends BaseEntity {
+
+        @ManyToOne(fetch = FetchType.LAZY, optional = true)
+        @JoinColumn(name = "class_id", referencedColumnName = "classId", nullable = true)
+        private EazyClass eazyClass;
+    }
+
+    Notes (Green Highlight Section 1)
+    The @ManyToOne annotation is used to define a many-to-one relationship between two entities. The child entity, that has the join column, is called the owner of the relationship.
+    The @JoinColumn annotation is used to specify the foreign key column details.
+
+    @Entity
+    @Table(name = "class")
+    public class EazyClass extends BaseEntity {
+        
+        @OneToMany(mappedBy = "eazyClass", fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST, targetEntity = Person.class)
+        private Set<Person> persons;
+    }
     
+    Notes (Green Highlight Section 2)
+    A one-to-many relationship between two entities is defined by using the @OneToMany annotation.
+    It also declares the mappedBy element to indicate the entity that owns the bidirectional relationship.
+    Usually, the child entity is the one that owns the relationship and the parent entity contains the @OneToMany annotation.
+
+181. Implement OneToMany & ManyToOne configurations inside Entity classes
+
+182. Displaying new Web Page on click of classes link in Dashboard
+
+183. Add & Delete Classes enhancement inside Eazy School Web App
+
+184. Display, Add & Delete Students enhancement inside Eazy School Web App - Part 1
+
+185. Display, Add & Delete Students enhancement inside Eazy School Web App - Part 2
+
+############################### SECTION 24: DEEP DIVE ON MANYTOMANY RELATIONSHIP & CONFIGURATION INSIDE ORM FRAMEWORKS ############################
+
+186. Introduction to ManyToMany relationship in ORM frameworks
+    A many-to-many relationship refers to the relationship between two entities/tables A and B in which one element/row of A are associated with many elements/rows of B and vice versa.
+
+    Below are few real-life examples of many-to-many relationships:
+
+    COURSES ↔ STUDENTS  (Many to Many)
+
+    ORDERS ↔ PRODUCTS  (Many to Many)
+
+    Spring Data JPA allows developers to build many-to-many relationships between entities with simple configurations. Below are the sample configurations between Courses and Persons.
+    @Entity
+    public class Person extends BaseEntity{
+        @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+        @JoinTable(name = "person_courses", 
+                joinColumns = {
+                    @JoinColumn(name = "person_id", referencedColumnName = "personId")},
+                inverseJoinColumns = {
+                    @JoinColumn(name = "course_id", referencedColumnName = "courseId")})
+        private Set<Courses> courses = new HashSet<>();
+    }
+
+    In a bidirectional relationship of @ManyToMany, only one entity can own the relationship. Here we choose Courses as the owning entity. We usually mention mappedBy parameter on the owning entity.
+
+    @Entity
+    public class Courses extends BaseEntity{
+        @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+        private Set<Person> persons = new HashSet<>();
+    }
+
+    Why do we really need a third table in Many to Many relationship? Lets assume we have below tables and records which have many-to-many relationship between them.
+
+    If we need to represent multiple courses that the same student enrolled, the best way is to maintain a middle third table like shown below. Otherwise, we need to maintain a lot of duplicate rows inside the Person table.
+
+    COURSES Table
+
+    COURSE ID  |  NAME    |  FEES
+    123        |  Music   |  $1200
+    124        |  Yoga    |  $800
+    125        |  Football|  $1500
+
+    PERSON_COURSES Table
+
+    PERSON ID | COURSE ID
+    456       | 123
+    456       | 124
+    456       | 125
+
+    PERSONS Table
+
+    PERSON ID | NAME  | EMAIL
+    456       | John  | j@ gmail.com
+    457       | Peter | p@ gmail.com
+    458       | Anna  | a@ gmail.com
+
+187. Implement ManyToMany configurations inside Entity classes
+
+188. Display & Add Courses enhancement inside Eazy School Web App - Part 1
+
+189. Display & Add Courses enhancement inside Eazy School Web App - Part 2
+
+190. Display & Add Students enhancement inside Course Web Page
+
+191. Delete Student enhancement inside Course Web Page
+
+192. Implement Student Dashboard related enhancements inside Eazy School Web App
+
+############################################## SECTION 25: SORTING AND PAGINATION INSIDE SPRING DATA JPA ##########################################
+
+193. Introduction to Sorting inside Spring Data JPA
+    Sorting:-
+
+    Introduction
+    ✓ Spring Data JPA supports Sorting to Query results with easier configurations.
+    ✓ Spring Data JPA provides default implementations of Sorting with the help of PagingAndSortingRepository interface.
+    ✓ There are two ways to achieve Sorting in Spring Data JPA:
+        1) Static Sorting
+        2) Dynamic Sorting
+
+    Static Sorting
+    ✓ Static sorting refers to the mechanism where the retrieved data is always sorted by specified columns and directions. The columns and sort directions are defined at the development time and cannot be changed at runtime.
+    ✓ Below is an example of Static Sorting:
+        List<Person> findByOrderByNameDesc()
+
+    Dynamic Sorting
+    ✓ By using dynamic sorting, you can choose the sorting column and direction at runtime to sort the query results.
+    ✓ Dynamic sorting provides more flexibility in choosing sort columns and directions with the help of Sort parameter to your query method. The Sort class is just a specification that provides sorting options for database queries. Below is an example:
+        Sort sort = Sort.by("name").descending().and(Sort.by("age"));
+
+194. Implement & Demo of Static Sorting
+
+195. Implement & Demo of Dynamic Sorting
+
+196. Introduction to Pagination inside Spring Data JPA
+    Pagination :-
+
+    Introduction :-
+    ✓ Spring Data JPA supports Pagination which helps easy to manage & display large amount of data in various pages inside web applications
+    ✓ Just like the special Sort parameter we have for the dynamic sorting, Spring Data JPA supports another special parameter called Pageable for paginating the query results.
+    ✓ We can combine both pagination and dynamic sorting with the help of Pageable
+
+    Dynamic Sorting :-
+    ✓ Whenever we want to apply pagination to query results, all we need to do is just add Pageable parameter to the query method definition and set the return type by Page<T>, like below:
+    Pageable pageable = PageRequest.of(0, 5, Sort.by("name").descending());
+    Page<Person> findByName(String name, Pageable pageable);
+
+############################################## SECTION 26: WRITING CUSTOM QUERIES INSIDE SPRING DATA JPA ##########################################
+
+199. Introduction to custom queries using @Query,@NamedQuery,@NamedNativeQuery & JPQL
+    Custom Queries with JPA
+    Introduction:-
+
+    ✓ Derived queries are good as long as they are not complex. As the number of query parameters goes beyond 3 to 4, you need a more flexible strategy.
+
+    ✓ For such complicated or custom scenarios, Spring Data JPA allows developers to write their own queries with the help of the below annotations:
+
+    @Query
+    @NamedQuery
+    @NamedNativeQuery
+
+    @Query Annotation
+
+    ✓ The @Query annotation defines queries directly on repository methods. This gives you full flexibility to run any query without following the method naming conventions.
+
+    ✓ With the help of @Query annotation we can write queries in the form of JPQL or Native SQL.
+
+    ✓ Whenever we are writing a native SQL query, we need to mention
+    nativeQuery = true inside the @Query annotation.
+
+    Named Queries
+
+    ✓ For bigger applications where they may have 1000s of queries scattered across the application, it makes sense to maintain all these queries in a single place logically — using annotations, properties, or XML files.
+
+    ✓ We can create named queries easily with the below annotations placed on top of an entity class:
+
+    @NamedQuery          – Used to define a JPQL named query.
+    @NamedNativeQuery    – Used to define a native SQL named query.
+
+    JPQL
+    Introduction:-
+
+    ✓ The Java Persistence Query Language (JPQL) is a platform-independent object-oriented query language defined as part of the Java Persistence API (JPA) specification.
+
+    ✓ JPQL is used to make queries against entities stored in a relational database. It is heavily inspired by SQL, and its queries resemble SQL syntax, but operate against JPA entity objects rather than directly with database tables.
+
+    ✓ The only drawback of using JPQL is that it supports a subset of the SQL standard. So, it may not be a great choice for complex queries.
+
+    JPQL Example
+
+    ✓ Below is an example of JPQL. You can observe we are using the entity names and entity fields instead of table and column names:
+
+    @Query("SELECT c FROM Contact c WHERE c.contactId = ?1 ORDER BY c.createdAt DESC")
+    List<Contact> findByIdOrderByCreatedDesc(long id);
+    
+200. Writing Custom Queries using @Query Annotation
+
+201. Writing Custom Update Queries using @Query,@Modifying,@Transactional Annotations
+        Using @Query, we can also run UPDATE, DELETE, INSERT as well
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Contact c SET c.status = ?1 WHERE c.contactId = ?2")
+    int updateStatusById(String status, int id);
+
+    Whenever we are using queries that change the state of the database, they should be treated differently. We need to explicitly tell Spring Data JPA that our custom query changes the data by annotating the repository method with an additional @Modifying annotation. It will then execute the custom query as an update operation.
+
+    On whichever method/class we declare @Transactional the boundary of transaction starts and boundary ends when method execution completes. Lets say you are updating entity1 and entity2. Now while saving entity2 an exception occur, then as entity1 comes in same transaction so entity1 will be rollback with entity2. Any exception will result in rollback of all JPA transactions with DB.
+
+202. Deep dive on @NamedQuery,@NamedNativeQuery inside Spring Data JPA
+    @NamedQuery example declared on top of the entity class
+
+    @Entity
+    @NamedQuery(name="Contact.findOpenMsgs", query = "SELECT c FROM Contact c WHERE c.status = :status")
+    public class Contact extends BaseEntity{
 
 
+    @NamedNativeQuery example declared on top of the entity class
+
+    @Entity
+    @NamedNativeQuery(
+        name = "Contact.findOpenMsgsNative",
+        query = "SELECT * FROM contact_msg c WHERE c.status = :status",
+        resultClass = Contact.class
+    )
+    public class Contact extends BaseEntity{
+
+    For @NamedQuery as long as the method name inside Repository class matches with the name of the query we should be good. Where as for @NamedNativeQuery apart from query name & method name match, we should also mention @Query(nativeQuery = true) on top of the Repository method.
+
+    Do you know we can create multiple named queries and named native queries using the annotations @NamedQueries and @NamedNativeQueries. Below is the syntax of the same,
+
+    @NamedQueries({
+        @NamedQuery(name = "one", query = "?"),
+        @NamedQuery(name = "two", query = "?")
+    })
+
+    @NamedNativeQueries({
+        @NamedNativeQuery(name = "one", query = "?", resultClass = ?),
+        @NamedNativeQuery(name = "two", query = "?", resultClass = ?)
+    })
+
+203. Writing Custom Queries using @NamedQuery,@NamedNativeQuery Annotations
+    @Query Examples
+    @Query example with positional parameters
+    // Positional parameters
+    @Query("SELECT c FROM Contact c WHERE c.status = ?1 AND c.name = ?2 ORDER BY c.createdAt DESC")
+    List<Contact> findByGivenQueryOrderByCreatedDesc(String status, String name);
+
+    @Query example with named parameters
+    // named parameters
+    @Query("SELECT c FROM Contact c WHERE c.status = :status AND c.name = :name ORDER BY c.createdAt DESC")
+    List<Contact> findByGivenQueryOrderByCreatedDesc(
+            @Param("status") String status,
+            @Param("name") String name);
+
+    Below is an example where we are telling to JPA to fetch the first page by considering the total page size as 5
+    Pageable pageable = PageRequest.of(0, 5);
+    Page<Contact> msgPage = contactRepository.findByStatus("Open", pageable);
+
+    Below is an example where we are applying both pagination & sorting dynamically based on the input received.
+    public Page<Contact> findMsgsWithOpenStatus(int pageNum, String sortField, String sortDir) {
+
+    int pageSize = 5;
+    Pageable pageable = PageRequest.of(
+            pageNum - 1,
+            pageSize,
+            sortDir.equals("asc") ? Sort.by(sortField).ascending()
+                                  : Sort.by(sortField).descending()
+    );
+
+    Page<Contact> msgPage = contactRepository.findByStatus("Open", pageable);
+    return msgPage;
+    }
+
+    Note (from the yellow cloud):
+
+    Dynamic sorting is not supported by named queries.
+    So while using Pagination along with Named Queries, make sure that Pageable instance does not contain a Sort object.
+
+############################################## SECTION 27: BUILDING REST SERVICES USING SPRING FRAMEWORK ##########################################
+
+204. Introduction to REST Services
+    REST (Representational state transfer) services are one of the most often encountered ways to implement communication between two web apps. REST offers access to functionality the server exposes through endpoints a client can call.
+
+    Below are the different use cases where REST services are being used most frequently these days.
+
+    Mobile App
+    ⬌ (Communication using REST) ⬌
+    Backend Server
+
+    Backend Server 1
+    ⬌ (Communication using REST) ⬌
+    Backend Server 2
+
+    Web App built using Angular, React JS etc.
+    ⬌ (Communication using REST) ⬌
+    Backend Server
+
+    SOAP = SIMPLE OBJECT ACCESS PROTOCOL 
+
+205. Build REST services using Spring MVC style & @ResponseBody annotation - Theory
+    Below is the sample code implementing Rest Service using Spring MVC style but only with the addition of @ResponseBody annotation
+
+    @Controller
+    public class ContactRestController {
+
+        @Autowired
+        ContactRepository contactRepository;
+
+        @GetMapping("/getMessagesByStatus")
+        @ResponseBody
+        public List<Contact> getMessagesByStatus(@RequestParam(name = "status") String status) {
+            return contactRepository.findByStatus(status);
+        }
+    }
+
+    Callout Bubble Text
+    The @ResponseBody annotation tells the dispatcher servlet that the controller’s action will not return a view name but the data sent directly in the HTTP response.
+
+206. Implement REST service using Spring MVC style & @ResponseBody - Part 1
+
+207. Implement REST service using Spring MVC style & @ResponseBody - Part 2
+
+208. Deep dive & Demo of @RequestBody annotation
+
+209. Implement REST Services using @RestController annotation
+    Instead of mentioning @ResponseBody on each method inside a Controller class which is a duplicate code, Spring offers the @RestController annotation, a combination of @Controller and @ResponseBody.
+
+    @RestController
+    public class ContactRestController {
+
+        @Autowired
+        ContactRepository contactRepository;
+
+        @GetMapping("/getMessagesByStatus")
+        public List<Contact> getMessagesByStatus(@RequestParam(name = "status") String status) {
+            return contactRepository.findByStatus(status);
+        }
+    }
+
+    Callout Highlight (Yellow)
+
+    @RestController = @Controller + @ResponseBody
+
+210. Demo of save operation using Rest Service & ResponseEntity
+
+211. Demo of delete operation using Rest Service & RequestEntity
+
+212. Demo of update operation using Rest Service & recap of all Rest annotations
+    Green Box
+    @RestController – can be used to put on top of a call.
+    This will save developers from mentioning @ResponseBody on each methods
+
+    Blue Box
+    @ResponseBody – can be used on top of a method to build a Rest API when we are using @Controller on top of a Java class
+
+    Yellow Box
+    ResponseEntity<T> – Allow developers to send response body, status, and headers on the HTTP response.
+
+    Gray Box
+    @RestControllerAdvice – is used to mark the class as a REST controller advice. Along with @ExceptionHandler, this can be used to handle exceptions globally inside app.
+
+    Black Box
+    RequestEntity<T> – Allow developers to receive the request body, header in a HTTP request.
+
+    Purple Box
+    @RequestHeader & @RequestBody – is used to receive the request body and header individually.
+
+213. Implement global error logic for Rest Services using @RestControllerAdvice
+
+214. Deep dive on CROSS-ORIGIN RESOURCE SHARING (CORS) & @CrossOrigin annotation
+    CORS is a protocol that enables scripts running on a browser client to interact with resources from a different origin. For example, if a UI app wishes to make an API call running on a different domain, it would be blocked from doing so by default due to CORS. So CORS is not a security issue/attack but the default protection provided by browsers to stop sharing the data/communication between different origins.
+
+    “other origins” means the URL being accessed differs from the location that the JavaScript is running from, by having:
+    a different scheme (HTTP or HTTPS)
+    a different domain
+    a different port
+
+    By default browser will block this communication due to CORS
+    UI App running on https://domain1.com
+    ⟷ Backend API running on https://domain2.com
+
+215. Sending Response in XML format in Rest Services
+
+216. Demo of Content filter inside Rest Services using @JsonIgnore annotation
+    Do you know Jackson library provide annotations to control the way we send data in REST API JSON response. Below are the few annotations,
+
+    @JsonProperty – This annotation can be mentioned on top of any field of a POJO class. While sending the JSON response, instead of sending the field name Jackson will send the property name that we mentioned.
+
+    @JsonProperty("person_name")
+    private String name;
+
+    @JsonIgnore – This annotation will make sure to not send the information present inside the given field. This is useful to filter the data which is sensitive or unnecessary in the response.
+
+    @JsonIgnore
+    private LocalDateTime createdAt;
+
+    We can also use @JsonIgnoreProperties(value = { "createdAt" }) on top of a POJO class if we want to mention multiple fields.
+
+############################################# SECTION 28: CONSUMING REST SERVICES USING SPRING FRAMEWORK ##########################################
+
+217. Introduction to Consuming Rest Services inside Web Applications
+    Apart from building the Rest service, often we may need to consume the Rest Services exposed by other third party vendors. So knowing how to consume Rest services is equally important.
+
+    Below are the most commonly used approaches that are provided by Spring framework,
+
+    OpenFeign
+    A tool offered by the Spring Cloud project. Using this very similar to like how build Repositories with Spring Data JPA. In similar way we just need to write interfaces but not implementation code.
+
+    RestTemplate
+    A well-known tool developers have been using since Spring 3 to call REST endpoints. RestTemplate is often used today in Spring apps. But this is deprecated in the favor of WebClient.
+
+    WebClient
+    Created as part of the Spring Web Reactive module, and will be replacing the classic RestTemplate. This is introduced to support all modes of invocation like Sync and Async (non-blocking).
+
+218. Consuming Rest Services using OpenFeign - Theory
+    In order to consume the REST services using OpenFeign, we need to follow the below steps.
+
+    Step 1: After adding all the required dependencies inside the pom.xml, we need to create a proxy interface with all the details around API that we are going to consume. Inside the interface we need to create method name matching the details of the destination API method we are going to consume.
+
+    @FeignClient(name = "contact", url = "http://localhost:8080/api/contact",
+        configuration = ProjectConfiguration.class)
+    public interface ContactProxy {
+        @RequestMapping(method = RequestMethod.GET, value = "/getMessagesByStatus")
+        @Headers(value = "Content-Type: application/json")
+        public List<Contact> getMessagesByStatus(@RequestParam("status") String status);
+    }
+
+    Step 2: If we need to send the authentication details, then create a bean with the required details.
+
+    @Bean
+    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
+        return new BasicAuthRequestInterceptor("admin@eazyschool.com", "admin");
+    }
+
+    Step 3: Finally, we are good to use the proxy object to make a REST call like shown below.
+
+    @Autowired
+    ContactProxy contactProxy;
+
+    @GetMapping("/getMessages")
+    public List<Contact> getMessages(@RequestParam("status") String status) {
+        return contactProxy.getMessagesByStatus(status);
+    }
+
+219. Consuming Rest Services using OpenFeign - Coding
+
+220. Consuming Rest Services using RestTemplate
+    Step 1: After adding all the required dependencies inside the pom.xml, we need to create a RestTemplate bean along with the authentication details if any, like below.
+
+    @Bean
+    public RestTemplate restTemplate() {
+        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+        return restTemplateBuilder.basicAuthentication("admin@eazyschool.com", "admin").build();
+    }
+
+    Step 2: Using RestTemplate methods like exchange(), we can consume a REST service as mentioned below.
+
+    @PostMapping("/saveMsg")
+    public ResponseEntity<Response> saveMsg(@RequestBody Contact contact) {
+        String uri = "http://localhost:8080/api/contact/saveMsg";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("invocationFrom", "RestTemplate");
+
+        HttpEntity<Contact> httpEntity = new HttpEntity<>(contact, headers);
+        ResponseEntity<Response> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, httpEntity, Response.class);
+
+        return responseEntity;
+    }
+
+    NOTE:- If you encounter a compilation error for RestTemplateBuilder while using Spring Boot 4.x.x, ensure that you add the spring-boot-starter-restclient dependency (org.springframework.boot).
+
+221. Consuming Rest Services using WebClient
+    In order to consume the REST services using WebClient, we need to follow the below steps.
+
+    Step 1: After adding all the required dependencies inside the pom.xml, we need to create a WebClient bean along with the authentication details if any, like below.
+
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder()
+                .filter(ExchangeFilterFunctions
+                        .basicAuthentication("admin@eazyschool.com", "admin"))
+                .build();
+    }
+
+    Step 2: Using WebClient methods like post(), we can consume a REST service like mentioned below.
+
+    @Autowired
+    WebClient webClient;
+
+    @PostMapping("/saveMessage")
+    public Mono<Response> saveMessage(@RequestBody Contact contact) {
+        String uri = "http://localhost:8080/api/contact/saveMsg";
+        return webClient.post().uri(uri)
+                .header("invocationFrom", "WebClient")
+                .body(Mono.just(contact), Contact.class)
+                .retrieve()
+                .bodyToMono(Response.class);
+    }
+
+############################################## SECTION 29: DEEP DIVE ON SPRING DATA REST & HAL EXPLORER ###########################################
+
+222. Introduction to Spring Data Rest & HAL Explorer
+    Apart from doing a magic of automatically creating repository implementations based on interfaces you define in your code, Spring Data has another feature that can help you define REST APIs for repositories created by Spring Data.
+
+    For the same, we have Spring Data REST which is another member of the Spring Data family.
+
+    To start using Spring Data REST in our project, we just need to add the following dependency to our pom.xml:
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-rest</artifactId>
+    </dependency>
+
+    We just need to add the Spring Data Rest starter project and believe it or not, thats the only change is expected from the Developer. Post that the application gets auto-configuration that enables automatic creation of a REST API for any repositories that were created by Spring Data.
+
+    The REST APIs will be created for any kind of implementation like Spring Data JPA, Spring Data Mongo etc. The REST endpoints that Spring Data REST generates are at least as good as (and possibly even better than) the ones Developers create. 😊
+
+    By adding the HAL Explorer along with Spring Data REST, we can look all the APIs exposed by Spring Data Rest by opening the URL http://localhost:8080 in the browser assuming that your App started at 8080 port itself.
+
+    We can check all the REST APIs exposed by Spring Data REST by opening the URL https://localhost:8080/profile in the browser.
+
+    HAL (Hypertext Application Language) is a simple format that gives a consistent and easy way to hyperlink between resources in your API.
+
+    Adopting HAL will make your API explorable, and its documentation easily discoverable from within the API itself. In short, it will make your API easier to work with and therefore more attractive to client developers.
+
+    To start using HAL explorer along with Spring Data REST in our project, we just need to add the following dependency to our pom.xml:
+
+    <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-rest-hal-explorer</artifactId>
+    </dependency>
+
+    We can check the HAL explorer by opening the URL http://localhost:8080/ in the browser. The UI is an Angular-based web application that lets you easily explore HAL and HAL-FORMS based HTTP responses.
+
+223. Deep dive of Spring Data Rest & exploring Rest APIs - Part 1
+
+224. Deep dive of Spring Data Rest & exploring Rest APIs - Part 2
+
+225. Exploring Rest APIs of Spring Data Rest using HAL Explorer
+
+226. Securing Spring Data Rest APIs & HAL Explorer
+
+227. Quick Tips around Spring Data Rest
+    Do you know we can change the default path exposed by Spring Data REST using the below configurations. This will change the default path as per your configurations.
+
+    spring.data.rest.basePath=/data-api
+
+    Using @RepositoryRestResource annotation, we can also control the way the paths of the repositories are being exposed.
+    @RepositoryRestResource(path = "courses")
+
+    For some reason, if you don’t want to expose a Repository, then we can do the below configuration on top of the Repository class:
+    @RepositoryRestResource(exported = false)
+
+############################################### SECTION 30: LOGGING CONFIGURATION INSIDE SPRING BOOT ##############################################
+
+228. Introduction to Logging inside SpringBoot
+    Logging
+    Introduction
+    By default, we don’t have to worry about logging if we are using Spring Boot. Most of the configurations and logging are done by Spring Boot itself.
+
+    Usually, we have the following types of logging:
+    FATAL (Logback doesn’t have)
+    ERROR
+    WARN
+    INFO
+    DEBUG
+    TRACE
+
+    Logging Types
+    In Java, we have many logging frameworks like Java Util logging, Log4J2, SLF4J, Logback. By default, if you use the “Starters,” Logback is used for logging.
+
+    Appropriate Logback routing is also included in Spring Boot to ensure that dependent libraries that use Java Util Logging, Commons Logging, Log4J, or SLF4J all work correctly.
+
+    By default, ERROR-level, WARN-level, and INFO-level messages are logged. But we can change them based on our requirements and environments.
+
+229. Logging configurations for SpringBoot framework code
+    We can enable debug logging or trace logging by mentioning the below properties inside application.properties file:
+    debug=true
+    trace=true
+
+    Alternatively, we can provide the flags while starting the application like mentioned below:
+    $ java -jar myapp.jar --debug
+
+    The way logging works is if we enable trace, then all above severities like Debug, Info, Warn & Error are also printed. Suppose if we enable error logging only, then all lower severities like Warn, Info, Debug, Trace will not be logged.
+
+    If needed, we can control the logging at the package level by mentioning properties like below inside application.properties:
+    logging.level.root=INFO
+    logging.level.com.eazybytes.eazyschool.aspects = ERROR
+
+230. Logging configurations for Application code
+    It is often useful to be able to group related loggers together so that they can all be configured at the same time. For example, I may have an requirement to change the logging levels for all my project-related packages very frequently. To help with this, Spring Boot allows you to define logging groups. Below is the sample configuration:
+
+    # Initialize log group eazyschool_error
+    logging.group.eazyschool_error=com.eazybytes.eazyschool.aspects, com.eazybytes.eazyschool.controller
+    # Set log level to log group eazyschool_error
+    logging.level.eazyschool_error=ERROR
+
+    If your terminal supports ANSI, color output is used to aid readability of your logs. You can set the below property to enable the same:
+
+    spring.output.ansi.enabled=ALWAYSIt is often useful to be able to group related loggers together so that they can all be configured at the same time. For example, I may have an requirement to change the logging levels for all my project-related packages very frequently. To help with this, Spring Boot allows you to define logging groups. Below is the sample configuration:
+
+    # Initialize log group eazyschool_error
+    logging.group.eazyschool_error=com.eazybytes.eazyschool.aspects, com.eazybytes.eazyschool.controller
+    # Set log level to log group eazyschool_error
+    logging.level.eazyschool_error=ERROR
+
+    If your terminal supports ANSI, color output is used to aid readability of your logs. You can set the below property to enable the same:
+    spring.output.ansi.enabled=ALWAYS
+
+231. Store log statements into a custom file and folder
+    Below is the default logging format in Spring Boot. Below is a sample logger message and format details of it:
+    2025-01-21 08:02:46.035  INFO 15084 --- [ restartedMain] c.e.eazyschool.EazyschoolApplication  : Started EazyschoolApplication in 5.189 seconds (JVM running for 2123.116)
+
+    ✔ Date and Time: Millisecond precision and easily sortable.
+    ✔ Log Level: ERROR, WARN, INFO, DEBUG, or TRACE.
+    ✔ Process ID.
+    ✔ A --- separator to distinguish the start of actual log messages.
+    ✔ Thread name: Enclosed in square brackets (may be truncated for console output).
+    ✔ Logger name: This is usually the source class name (often abbreviated).
+    ✔ The log message.
+
+    By default, Spring Boot logs only to the console and does not write log files. If you want to write log files in addition to the console output, we can create a file with the name logback.xml inside class path and define all our logging requirements in it.
+
+    NOTE :- 
+    Do you know Lombok has various annotations to help developers with logging based on the logging framework being used?
+    @Slf4j will generate the below code and we can use the log variable directly:
+
+    @Slf4j
+    public class LogExample {
+    }
+
+    will generate:
+
+    public class LogExample {
+        private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LogExample.class);
+    }
+
+    Similarly, using @CommonsLog, @Log4j2 will generate log variables from the respective library class.
+
+######################################### SECTION 31: PROPERTIES CONFIGURATION & PROFILES INSIDE SPRINGBOOT #######################################
+
+232. Introduction to Externalized properties inside Spring Boot Web Applications
+    Configurations
+    Introduction
+
+    Spring Boot lets you externalize your configuration so that you can work with the same application code in different environments. You can use a variety of external configuration sources, including Java properties files, YAML files, environment variables, and command-line arguments.
+
+    By default, Spring Boot looks for the configurations or properties inside application.properties / YAML present in the classpath location. But we can have other property files as well and make Spring Boot read from them.
+
+    Config/Properties Preferences
+
+    Spring Boot uses a very particular order that is designed to allow sensible overriding of values. Properties are considered in the following order (with values from lower items overriding earlier ones):
+
+    • Properties present inside files like application.properties
+    • OS Environmental variables
+    • Java System properties (System.getProperties())
+    • JNDI attributes from java:comp/env
+    • ServletContext init parameters
+    • ServletConfig init parameters
+    • Command line arguments
+
+233. Reading properties using @Value annotation
+    application.properties
+    eazyschool.pageSize=10  
+    eazyschool.contact.successMsg=Your message is submitted successfully.
 
 
+    Code
+    @Controller  
+    public class DashboardController {  
+        @Value("${eazyschool.pageSize}")  
+        private int defaultPageSize;  
+
+        @Value("${eazyschool.contact.successMsg}")  
+        private String message;  
+    }
+
+    Explanation
+    We can read the properties/configurations, defined inside a properties file with the help of @Value annotation like shown below.
+    @Value annotation leverages SpEL expressions to read the configurations present inside the properties file.
+
+234. Reading properties using Environment interface
+    application.properties
+    eazyschool.pageSize=10  
+    eazyschool.contact.successMsg=Your message is submitted successfully.
+
+    Code
+    @Controller  
+    public class DashboardController {  
+
+        @Autowired  
+        private Environment environment;  
+
+        private void logProperties() {  
+            log.info(environment.getProperty("eazyschool.pageSize"));  
+            log.info(environment.getProperty("eazyschool.contact.successMsg"));  
+            log.info(environment.getProperty("JAVA_HOME"));  
+        }  
+    }
+
+    Explanation
+    Along with @Value, we can read the properties/configurations loaded with the help of the Environment bean as well, which is created by the Spring framework.
+    Apart from user-defined properties, using Environment we can read any environment-specific properties as well.
+
+235. Reading properties using @ConfigurationProperties - Theory
+    Explanation
+    Spring Boot allows loading all the properties which are logically together into a Java bean. For this, we can use the @ConfigurationProperties annotation on top of a Java bean by providing the prefix value.
+    We need to make sure to use the same names inside the bean and properties file.
+    Please follow the below steps to read the properties using @ConfigurationProperties.
+
+    application.properties
+
+    eazyschool.pageSize=10  
+    eazyschool.contact.pageSize=5  
+    eazyschool.contact.successMsg=Your message is submitted successfully.  
+    eazyschool.branches[0]=NewYork  
+    eazyschool.branches[1]=Delhi  
+    eazyschool.branches[2]=Paris  
+    eazyschool.branches[3]=Singapore
+
+    Explanation
+    @PropertySource – Can be used to mention the property file name if we are using something other than application.properties.
+    @ConfigurationProperties – Can be used to mention the prefix value that needs to be considered while loading the properties into a given bean.
+    @Validated – Can be used if we want to perform validations on the properties based on the validation mentioned on the field.
+
+    Code
+    @Component("eazySchoolProps")  
+    @Data  
+    @PropertySource("classpath:some.properties")  
+    @ConfigurationProperties(prefix = "eazyschool")  
+    @Validated  
+    public class EazySchoolProps {  
+
+        @Min(value = 5, message = "must be between 5 and 25")  
+        @Max(value = 25, message = "must be between 5 and 25")  
+        private int pageSize;  
+
+        private Map<String, String> contact;  
+        private List<String> branches;  
+    }
+
+    Explanation
+    Step 3: Finally, we can inject the bean, which we created in the previous step, and start reading the properties from it using Java style as shown above.
+
+    Code
+    @Service  
+    public class ContactService {  
+
+        @Autowired  
+        EazySchoolProps eazySchoolProps;  
+
+        public Page<Contact> findMsgsWithOpenStatus(int pageNum, String sortField, String sortDir) {  
+            int pageSize = eazySchoolProps.getPageSize();  
+            if (null != eazySchoolProps.getContact() && null != eazySchoolProps.getContact().get("pageSize")) {  
+                pageSize = Integer.parseInt(eazySchoolProps.getContact().get("pageSize").trim());  
+            }  
+        }  
+    }
+
+    Explanation
+    Sometimes we maintain properties inside files which have names not equal to application.properties. In those scenarios, if we try to use @Value, it will not work.
+
+    First, we need to communicate to Spring Boot about the property files with the below steps.
+
+    Code
+    @Configuration  
+    @PropertySource(value = "classpath:config.properties", ignoreResourceNotFound = true)  
+    public class AppConfig {  
+    }
 
 
+    We can configure multiple property files as well using @PropertySources annotation like mentioned here:
 
+    @Configuration  
+    @PropertySources({  
+        @PropertySource(value = "classpath:config.properties", ignoreResourceNotFound = true),  
+        @PropertySource("classpath:server.properties")  
+    })  
+    public class AppConfig {  
+    }
 
+236. Reading properties using @ConfigurationProperties - Coding
 
+237. Introduction to Profiles in Spring
+    Profiles
+    Introduction
 
+    Spring provides a great tool for grouping configuration properties into so-called profiles (dev, uat, prod), allowing us to activate a bunch of configurations based on the active profile.
+    Profiles are perfect for setting up our application for different environments, but they’re also being used in other use cases like Bean creation based on a profile, etc.
+    So basically, a profile can influence the application properties loaded and beans which are loaded into the Spring context.
 
+    Configuring Profiles
+    The default profile is always active. Spring Boot loads all properties in application.properties into the default profile.
 
+    We can create another profiles by creating property files like below:
+    application_prod.properties → for prod profile
+    application_uat.properties → for uat profile
 
+    We can activate a specific profile using spring.profiles.active property like below:
+    spring.profiles.active=prod
 
+238. Implementation & Demo of Profiles inside Eazy School Web App
 
+239. Various approaches to activate Profiles inside Spring
+    Do you know there are many ways to activate a profile? Below are the most commonly used.
 
+    By mentioning spring.profiles.active=prod inside the properties files.
 
+    Using environment variables like below:
+    export SPRING_PROFILES_ACTIVE=prod  
+    java -jar myApp-0.0.1-SNAPSHOT.jar
 
+    Using Java System property:
+    java "-Dspring-boot.run.profiles=prod" -jar myApp-0.0.1-SNAPSHOT.jar  
+    mvn spring-boot:run -Dspring-boot.run.profiles=prod
 
+    Activating a profile programmatically by invoking the method setAdditionalProfiles("prod") inside the SpringApplication class.
+
+    Using @ActiveProfiles while doing testing:
+    @SpringBootTest  
+    @ActiveProfiles({"uat"})
+
+    Configurations :-
+    Introduction
+
+    Spring Boot lets you externalize your configuration so that you can work with the same application code in different environments. You can use a variety of external configuration sources, including Java properties files, YAML files, environment variables, and command-line arguments.
+
+    By default, Spring Boot looks for the configurations or properties inside application.properties/yaml present in the classpath location. But we can have other property files as well and make Spring Boot to read from them.
+
+    Config/Properties Preferences:-
+    Spring Boot uses a very particular order that is designed to allow sensible overriding of values. Properties are considered in the following order (with values from lower items overriding earlier ones):
+
+    Properties present inside files like application.properties
+    OS Environment variables
+    Java System properties (System.getProperties())
+    JNDI attributes from java:comp/env
+    ServletContext init parameters
+    ServletConfig init parameters
+    Command line arguments
+
+240. Creating beans conditionally based on active profile
+    With the help of Profiles we can create the Bean conditionally. Below is an example where we can create different beans based on the active profile.
+
+    @Component
+    @Profile("!prod")
+    public class EazySchoolNonProdUsernamePwdAuthenticationProvider
+    {
+    implements AuthenticationProvider
+    }
+
+    @Component
+    @Profile("prod")
+    public class EazySchoolUsernamePwdAuthenticationProvider
+    {
+    implements AuthenticationProvider
+    }
+
+######################################### SECTION 32: DEEP DIVE ON SPRING BOOT ACTUATOR & SPRING BOOT ADMIN #######################################
+
+241. Introduction to Spring Boot Actuator
+    Actuator offers production-ready features such as monitoring and metrics to Spring Boot applications. Actuator’s features are provided by way of several endpoints, which are made available over HTTP.
+
+    To enable Actuator, we can mention the below dependency inside pom.xml:
+
+    <dependency> 
+        <groupId>org.springframework.boot</groupId> 
+        <artifactId>spring-boot-starter-actuator</artifactId> 
+    </dependency>
+
+    In a machine, an actuator is a component that’s responsible for controlling and moving a mechanism. In a Spring Boot application, the Spring Boot Actuator plays that same role, enabling us to see inside of a running application and, to some degree, control how the application behaves.
+
+    Using endpoints exposed by Actuator, we can know the following type of info:
+    ✓ Health
+    ✓ Configuration properties
+    ✓ Logging levels
+    ✓ Memory consumption
+    ✓ Beans information
+    ✓ Metrics etc.
+
+    Once the Actuator dependency is added to the project, we can navigate to http://localhost:8080/actuator
+
+    to check the list of APIs exposed by it.
+
+    By default, Actuator doesn’t expose many of the endpoints since they have sensitive information. We can expose them using the below property:
+    management.endpoints.web.exposure.include=*
+
+242. Implement and Secure Actuator inside Eazy School Web App
+
+243. Deepdive of Actuator endpoints
+    API Paths provided by Actuator
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | HTTP method        | Path                | Description                                                             |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /auditevents        | Produces a report of any audit events that have been fired.             |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /conditions         | Produces a report of autoconfiguration conditions that either passed    |
+    |                    |                     | or failed, leading to the beans created in the application context.     |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /configprops        | Describes all configuration properties along with the current values.   |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /beans              | Describes all the beans in the Spring application context.              |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET, POST, DELETE  | /env                | Produces a report of all property sources and their properties available|
+    |                    |                     | to the Spring application.                                              |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /env/{toMatch}      | Describes the value of a single environment property.                   |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /heapdump           | Downloads the heap dump.                                                |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /health             | Returns the aggregate health of the application and (possibly) the      |
+    |                    |                     | health of external dependent applications.                              |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /httptrace          | Produces a trace of the most recent 100 requests.                       |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /info               | Returns any developer-defined information about the application.        |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /loggers            | Produces a list of packages in the application along with their         |
+    |                    |                     | configured and effective logging levels.                                |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | HTTP method        | Path                | Description                                                             |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET, POST          | /loggers/{name}     | Returns the configured and effective logging level of a given logger.   |
+    |                    |                     | The effective logging level can be set with a POST request.             |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /mappings           | Produces a report of all HTTP mappings and their corresponding handler  |
+    |                    |                     | methods.                                                                |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /scheduledtasks     | Lists all scheduled tasks.                                              |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /threaddump         | Returns a report of all application threads.                            |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /metrics            | Returns a list of all metrics categories.                               |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+    | GET                | /metrics/{name}     | Returns a multidimensional set of values for a given metric.            |
+    +--------------------+---------------------+-------------------------------------------------------------------------+
+
+    "We can use Spring Boot Admin which is an administrative frontend web application that makes Actuator endpoints more consumable & readable by humans."
+
+244. Exploring Actuator data using Spring Boot Admin
+
+############################################### SECTION 33: DEPLOYING SPRING BOOT APP INTO AWS CLOUD #############################################
+
+245. Introduction to Cloud Deployment, AWS EC2 & AWS Elastic Beanstalk
+
+246. Packaging Spring Boot application for AWS Deployment
+
+247. Deploying Spring Boot app into AWS Elastic Beanstalk
+
+248. Switching DB inside AWS Elastic Beanstalk
+
+249. Deleting AWS Beanstalk & DB resources
+
+#################################################### SECTION 34: CONGRATULATION COURSE COMPLETED ##################################################
