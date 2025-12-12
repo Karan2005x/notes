@@ -108,7 +108,7 @@
 13: Creating Maven Project
 
 14: Creating Beans using @Bean annotation
-   @Bean annotation lets Spring know that it needs to call this method when it inializes its context and adds the returned object/value to the
+   @Bean annotation lets Spring know that it needs to call this method when it initializes its context and adds the returned object/value to the
    Spring context/Spring IoC Container.
 
    Ex.- @Bean
@@ -124,7 +124,7 @@
 
     Note:- Method names will become bean names as well in the context.
 
-    Note:- We cannot use direct BeanFactory and ApplicationContext because they are interface so we are creating object through  their implement
+    Note:- We cannot use direct BeanFactory and ApplicationContext because they are interface so we are creating object through their implement
     class.
         Ex.- var context = new AnnotationConfigApplicationContext(ProjectConfig.class); {AnnotationConfigApplicationContext used here because we 
         are configuring through annotations}
@@ -211,7 +211,7 @@
     context by writing less code compared to the @Bean option. With stereotype annotations, we need to add the annotation above the class for
     which we need to have an instance in the Spring Context.
 
-    Using @ComponentScan annotation over the configuration class, instruct Spring on where to find the classes you  marked with stereotype
+    Using @ComponentScan annotation over the configuration class, instruct Spring on where to find the classes you marked with stereotype
     annotations.
     Ex.-
         @ComponentScan(basePackages = "com.example.beans")
@@ -1382,7 +1382,7 @@
     ⬅️ evil.com returns a web page that has an embedded malicious link to change the email ID of the Netflix account.
     But the link appears with a text like — “90% OFF on iPhone”
 
-    Step 3 : User tempted and clicked on the malicious link which makes a request to Netflix.com. And since the login cookie already present 
+    Step 3 : User tempted and clicked on the malicio;us link which makes a request to Netflix.com. And since the login cookie already present 
     in the same browser and the request to change email is being made to the same domain Netflix.com, the backend server of Netflix.com can’t 
     differentiate from where the request came. So here the evil.com forged the request as if it is coming from a Netflix.com UI page.
 
@@ -1605,7 +1605,7 @@
     
     JPA => JAVA PERSISTENCE API
     
-143: Introduction to Spring Data143. Introduction to Spring Data
+143: Introduction to Spring Data Introduction to Spring Data
     Spring Data is a Spring ecosystem project that simplifies the persistence layer’s development by providing implementations according to the persistence technology we use. This way, we only need to write a few lines of code to define the repositories of our Spring app.
 
     Spring Application Logic
@@ -2090,7 +2090,6 @@
     [Student 1]
     [Student 2]
     [Student 3]
-
         ^  
         |  Many-to-One
         |
@@ -2104,7 +2103,6 @@
     [Page 1]
     [Page 2]
     [Page 3]
-
         ^  
         |  Many-to-One
         |
